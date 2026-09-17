@@ -77,3 +77,4 @@ local_qdrant/
 Thumbs.db
 .vscode/
 .idea/
+colab_cell_7_fix.txt
