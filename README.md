@@ -16,30 +16,30 @@ An end-to-end, portfolio-grade **Customer Support Agentic RAG Chatbot** engineer
 
 ```mermaid
 flowchart TD
-    subgraph Offline ETL & Training ["Google Colab & Google Drive (Offline)"]
-        Kaggle["Kaggle Twitter Support Dataset (~1GB)"] -->|Chunked Pandas ETL (50k rows)| Colab1["01_data_preparation_colab.ipynb"]
-        Colab1 -->|50,000 QA Pairs| Drive["Google Drive (/MyDrive/chatbot_data/)"]
-        Drive -->|Train Subset (7.5k pairs)| Colab2["02_qlora_finetuning_colab.ipynb"]
+    subgraph Data_Pipeline ["Google Colab and Google Drive - Offline"]
+        Kaggle["Kaggle Twitter Support Dataset (~1GB)"] -->|Chunked Pandas ETL 50k rows| Colab1["01_data_preparation_colab.ipynb"]
+        Colab1 -->|50,000 QA Pairs| Drive["Google Drive /chatbot_data/"]
+        Drive -->|Train Subset 7.5k pairs| Colab2["02_qlora_finetuning_colab.ipynb"]
         Colab2 -->|QLoRA 4-bit SFT| HF_Hub["Hugging Face Hub / GGUF Export"]
         Drive -->|Extract Canonical Articles| Colab3["03_vector_indexing_colab.ipynb"]
-        Colab3 -->|Batch Upsert| Qdrant["Qdrant Cloud (Free 1GB Cluster)"]
+        Colab3 -->|Batch Upsert| Qdrant["Qdrant Cloud Free 1GB"]
         Colab3 -->|Offline Export| SampleKB["scripts/data/sample_kb.json"]
     end
 
-    subgraph Backend Service ["Hugging Face Spaces (Port 7860)"]
+    subgraph Backend_Service ["FastAPI Service - Hugging Face Spaces :7860"]
         ClientReq["POST /api/chat"] --> Router["FastAPI Router"]
-        Router --> FastPath{"Trivial Greeting?"}
-        FastPath -->|Yes| GreetingResp["Fast-Path Direct Stream (<50ms)"]
-        FastPath -->|No| ReAct["Agentic ReAct Loop (max_iterations = 2)"]
+        Router --> FastPath{"Greeting Fast-Path?"}
+        FastPath -->|Yes| GreetingResp["Fast-Path Direct Stream (sub-50ms)"]
+        FastPath -->|No| ReAct["Agentic ReAct Loop (max 2 iters)"]
         ReAct --> Tool1["Tool: Knowledge Base Search"]
         ReAct --> Tool2["Tool: Order Status Checker"]
         ReAct --> Tool3["Tool: Human Escalation Dispatch"]
-        Tool1 --> VectorSvc["Vector Service (Qdrant Cloud / In-Memory Fallback)"]
+        Tool1 --> VectorSvc["Vector Service (Qdrant / In-Memory Fallback)"]
         ReAct --> GroqClient["Groq Cloud API (Llama-3.1-8b @ 300 t/s)"]
-        GroqClient --> SSEStream["SSE EventStream (tokens, citations, thoughts, metrics)"]
+        GroqClient --> SSEStream["SSE EventStream (tokens, citations, metrics)"]
     end
 
-    subgraph Frontend Application ["Vercel (Next.js 14 App Router)"]
+    subgraph Frontend_App ["Next.js 14 Web App - Vercel"]
         SSEStream --> UI["Chat UI (react-markdown, SSE parser)"]
         UI --> Inspector["Collapsible Knowledge Base Inspector"]
         UI --> Telemetry["Real-time Metrics Bar (Latency, tok/s, Citations)"]
