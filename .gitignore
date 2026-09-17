@@ -1,9 +1,5 @@
 # Environment and secrets
-.env
-.env*.local
-.env.development
-.env.test
-.env.production
+.env*
 !.env.example
 *.pem
 *.key
