@@ -1,12 +1,18 @@
 # Customer Support RAG Chatbot
 
 [![GitHub](https://img.shields.io/badge/GitHub-peiiaratef126--hub%2FChatbot-181717?style=flat&logo=github)](https://github.com/peiiaratef126-hub/Chatbot)
+[![Vercel App](https://img.shields.io/badge/Vercel-Live_Production-black?style=flat&logo=vercel)](https://frontend-opal-delta-yz5oct1bu2.vercel.app)
+[![Hugging Face Space](https://img.shields.io/badge/🤗_Hugging_Face-Live_Demo-yellow?style=flat)](https://huggingface.co/spaces/LoneVertex/customer-support-rag-demo)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Groq](https://img.shields.io/badge/Groq-300_tok%2Fsec-f55036?style=flat)](https://groq.com/)
 [![Qdrant](https://img.shields.io/badge/Qdrant-Vector_Search-dc2626?style=flat&logo=qdrant)](https://qdrant.tech/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Zero-Cost](https://img.shields.io/badge/Cost-100%25_Free_Tier-emerald.svg)](#zero-cost-architecture)
+
+> **Live Deployments:**
+> - 🌐 **Production Web Application:** [https://frontend-opal-delta-yz5oct1bu2.vercel.app](https://frontend-opal-delta-yz5oct1bu2.vercel.app)
+> - ⚡ **Hugging Face Space Showcase:** [https://huggingface.co/spaces/LoneVertex/customer-support-rag-demo](https://huggingface.co/spaces/LoneVertex/customer-support-rag-demo)
 
 An end-to-end, portfolio-grade **Customer Support Agentic RAG Chatbot** engineered for zero-cost deployment. Features a Next.js 14 frontend styled with modern UI design principles, a high-throughput FastAPI backend streaming Server-Sent Events (SSE) at 300 tokens/sec via Groq Cloud, an agentic ReAct loop with multi-tool reasoning, and reproducible Google Colab pipelines leveraging Google Drive.
 
