@@ -1,6 +1,7 @@
 # Customer Support RAG Chatbot
 
 [![GitHub](https://img.shields.io/badge/GitHub-peiiaratef126--hub%2FChatbot-181717?style=flat&logo=github)](https://github.com/peiiaratef126-hub/Chatbot)
+[![CI Quality Gate](https://github.com/peiiaratef126-hub/Chatbot/actions/workflows/ci.yml/badge.svg)](https://github.com/peiiaratef126-hub/Chatbot/actions/workflows/ci.yml)
 [![Vercel App](https://img.shields.io/badge/Vercel-Live_Production-black?style=flat&logo=vercel)](https://frontend-opal-delta-yz5oct1bu2.vercel.app)
 [![Hugging Face Space](https://img.shields.io/badge/🤗_Hugging_Face-Live_Demo-yellow?style=flat)](https://huggingface.co/spaces/LoneVertex/customer-support-rag-demo)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2-black?style=flat&logo=next.js)](https://nextjs.org/)
@@ -51,6 +52,18 @@ flowchart TD
         UI --> Telemetry["Real-time Metrics Bar (Latency, tok/s, Citations)"]
     end
 ```
+
+---
+
+## ⚡ Google Colab Cloud Pipelines (1-Click Launch)
+
+Open and execute directly in Google Colab (100% Free Tier, T4 GPU supported):
+
+| Pipeline Notebook | Description | Launch in Colab |
+|---|---|:---:|
+| **01. Data Preparation** | Chunked Pandas ETL (50k QA pairs from Kaggle, OOM-safe) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/peiiaratef126-hub/Chatbot/blob/main/notebooks/01_data_preparation_colab.ipynb) |
+| **02. 4-bit QLoRA Fine-Tuning** | Parameter-Efficient SFT on T4 with LoRA & GGUF export | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/peiiaratef126-hub/Chatbot/blob/main/notebooks/02_qlora_finetuning_colab.ipynb) |
+| **03. Vector Indexing** | Semantic chunking with `BAAI/bge-small-en-v1.5` & Qdrant | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/peiiaratef126-hub/Chatbot/blob/main/notebooks/03_vector_indexing_colab.ipynb) |
 
 ---
 
