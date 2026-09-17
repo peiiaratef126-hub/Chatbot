@@ -245,15 +245,24 @@ class VectorService:
                 ]
             )
 
-        # In a real environment, embeddings would be generated via sentence-transformers
-        # Here we perform search or fallback if collection missing
-        hits = self.qdrant_client.search(
-            collection_name=self.settings.QDRANT_COLLECTION,
-            query_vector=[0.0] * 384,  # Dummy if testing without embedder
-            query_filter=query_filter,
-            limit=top_k,
-            score_threshold=threshold
-        )
+        # Cross-version compatibility for qdrant-client (query_points vs search)
+        if hasattr(self.qdrant_client, "query_points"):
+            res = self.qdrant_client.query_points(
+                collection_name=self.settings.QDRANT_COLLECTION,
+                query=[0.0] * 384,
+                query_filter=query_filter,
+                limit=top_k,
+                score_threshold=threshold
+            )
+            hits = res.points
+        else:
+            hits = self.qdrant_client.search(
+                collection_name=self.settings.QDRANT_COLLECTION,
+                query_vector=[0.0] * 384,  # Dummy if testing without embedder
+                query_filter=query_filter,
+                limit=top_k,
+                score_threshold=threshold
+            )
 
         citations: List[KnowledgeCitation] = []
         for hit in hits:
