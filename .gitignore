@@ -1,0 +1,82 @@
+# Environment and secrets
+.env
+.env*.local
+.env.development
+.env.test
+.env.production
+!.env.example
+*.pem
+*.key
+*.p12
+*.secret
+*.cert
+*.id_rsa
+id_rsa*
+*.pub
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Jupyter / Colab
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+
+# Node.js / Next.js
+frontend/node_modules/
+node_modules/
+.next/
+frontend/.next/
+out/
+frontend/out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Datasets & Local Vector Storage
+data/raw/
+data/processed/
+*.csv
+*.parquet
+qdrant_storage/
+local_qdrant/
+*.tar.gz
+*.zip
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
