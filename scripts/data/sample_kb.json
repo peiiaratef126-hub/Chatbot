@@ -1,0 +1,802 @@
+[
+  {
+    "doc_id": 1,
+    "brand": "AppleSupport",
+    "category": "Technical Support",
+    "query": "iPhone battery drains rapidly after iOS update",
+    "resolution": "Ensure background app refresh is optimized under Settings > General > Background App Refresh. Allow 48 hours for indexing post-update, or check Battery Health & Charging in Settings.",
+    "text": "Brand: AppleSupport | Category: Technical Support | Issue: iPhone battery drains rapidly after iOS update | Resolution: Ensure background app refresh is optimized under Settings > General > Background App Refresh. Allow 48 hours for indexing post-update, or check Battery Health & Charging in Settings."
+  },
+  {
+    "doc_id": 2,
+    "brand": "AppleSupport",
+    "category": "Technical Support",
+    "query": "Face ID not recognized or disabled on iPhone",
+    "resolution": "Check for obstructions over the TrueDepth camera. Go to Settings > Face ID & Passcode, reset Face ID, and ensure your iPhone is running the latest iOS version.",
+    "text": "Brand: AppleSupport | Category: Technical Support | Issue: Face ID not recognized or disabled on iPhone | Resolution: Check for obstructions over the TrueDepth camera. Go to Settings > Face ID & Passcode, reset Face ID, and ensure your iPhone is running the latest iOS version."
+  },
+  {
+    "doc_id": 3,
+    "brand": "AppleSupport",
+    "category": "Billing & Payments",
+    "query": "Unauthorized Apple Services subscription charge",
+    "resolution": "Visit reportaproblem.apple.com to review your purchase history. Select the charge and click 'Request a refund' within 90 days of purchase.",
+    "text": "Brand: AppleSupport | Category: Billing & Payments | Issue: Unauthorized Apple Services subscription charge | Resolution: Visit reportaproblem.apple.com to review your purchase history. Select the charge and click 'Request a refund' within 90 days of purchase."
+  },
+  {
+    "doc_id": 4,
+    "brand": "AppleSupport",
+    "category": "Technical Support",
+    "query": "AirPods disconnecting or audio crackling",
+    "resolution": "Place both AirPods in the charging case for 30 seconds. In Settings > Bluetooth, tap the info icon next to your AirPods and select 'Forget This Device', then hold the setup button for 15 seconds to re-pair.",
+    "text": "Brand: AppleSupport | Category: Technical Support | Issue: AirPods disconnecting or audio crackling | Resolution: Place both AirPods in the charging case for 30 seconds. In Settings > Bluetooth, tap the info icon next to your AirPods and select 'Forget This Device', then hold the setup button for 15 seconds to re-pair."
+  },
+  {
+    "doc_id": 5,
+    "brand": "AppleSupport",
+    "category": "Technical Support",
+    "query": "MacBook Pro screen stays black after sleep",
+    "resolution": "Perform an SMC reset (for Intel) or simply connect the MagSafe charger and hold the power button for 10 seconds (for Apple Silicon Macs). Verify external monitor connections.",
+    "text": "Brand: AppleSupport | Category: Technical Support | Issue: MacBook Pro screen stays black after sleep | Resolution: Perform an SMC reset (for Intel) or simply connect the MagSafe charger and hold the power button for 10 seconds (for Apple Silicon Macs). Verify external monitor connections."
+  },
+  {
+    "doc_id": 6,
+    "brand": "AppleSupport",
+    "category": "Account & Security",
+    "query": "Locked out of Apple ID due to two-factor authentication",
+    "resolution": "Initiate account recovery at iforgot.apple.com. You will receive an automated SMS or verification email when your recovery period completes.",
+    "text": "Brand: AppleSupport | Category: Account & Security | Issue: Locked out of Apple ID due to two-factor authentication | Resolution: Initiate account recovery at iforgot.apple.com. You will receive an automated SMS or verification email when your recovery period completes."
+  },
+  {
+    "doc_id": 7,
+    "brand": "AppleSupport",
+    "category": "Technical Support",
+    "query": "iCloud storage full notification won't go away",
+    "resolution": "Go to Settings > [Your Name] > iCloud > Manage Account Storage. Review large backups, delete old device backups, or optimize Photos library storage.",
+    "text": "Brand: AppleSupport | Category: Technical Support | Issue: iCloud storage full notification won't go away | Resolution: Go to Settings > [Your Name] > iCloud > Manage Account Storage. Review large backups, delete old device backups, or optimize Photos library storage."
+  },
+  {
+    "doc_id": 8,
+    "brand": "AppleSupport",
+    "category": "Technical Support",
+    "query": "Apple Watch not tracking heart rate or workouts",
+    "resolution": "Clean the optical heart sensor on the back of the watch. In the Watch app on iPhone, verify Privacy > Heart Rate is toggled ON and the band is snug on your wrist.",
+    "text": "Brand: AppleSupport | Category: Technical Support | Issue: Apple Watch not tracking heart rate or workouts | Resolution: Clean the optical heart sensor on the back of the watch. In the Watch app on iPhone, verify Privacy > Heart Rate is toggled ON and the band is snug on your wrist."
+  },
+  {
+    "doc_id": 9,
+    "brand": "AppleSupport",
+    "category": "Technical Support",
+    "query": "iPad touch screen unresponsive in specific regions",
+    "resolution": "Remove any screen protector or case that might interfere with capacitance. Clean screen with a microfiber cloth and perform a forced reboot.",
+    "text": "Brand: AppleSupport | Category: Technical Support | Issue: iPad touch screen unresponsive in specific regions | Resolution: Remove any screen protector or case that might interfere with capacitance. Clean screen with a microfiber cloth and perform a forced reboot."
+  },
+  {
+    "doc_id": 10,
+    "brand": "AppleSupport",
+    "category": "Technical Support",
+    "query": "AirDrop failing to discover nearby devices",
+    "resolution": "Ensure both Bluetooth and Wi-Fi are active on both devices. In Control Center, set AirDrop visibility to 'Everyone for 10 Minutes'.",
+    "text": "Brand: AppleSupport | Category: Technical Support | Issue: AirDrop failing to discover nearby devices | Resolution: Ensure both Bluetooth and Wi-Fi are active on both devices. In Control Center, set AirDrop visibility to 'Everyone for 10 Minutes'."
+  },
+  {
+    "doc_id": 11,
+    "brand": "AppleSupport",
+    "category": "Technical Support",
+    "query": "Bluetooth spinning continuously without connecting",
+    "resolution": "Toggle Airplane Mode on for 10 seconds, then off. In Settings > General > Transfer or Reset iPhone > Reset, select 'Reset Network Settings'.",
+    "text": "Brand: AppleSupport | Category: Technical Support | Issue: Bluetooth spinning continuously without connecting | Resolution: Toggle Airplane Mode on for 10 seconds, then off. In Settings > General > Transfer or Reset iPhone > Reset, select 'Reset Network Settings'."
+  },
+  {
+    "doc_id": 12,
+    "brand": "AppleSupport",
+    "category": "Orders & Delivery",
+    "query": "Apple Store trade-in kit delivery status",
+    "resolution": "Trade-in shipping kits are dispatched within 2 business days of order shipment. Track via apple.com/orderstatus using your order number.",
+    "text": "Brand: AppleSupport | Category: Orders & Delivery | Issue: Apple Store trade-in kit delivery status | Resolution: Trade-in shipping kits are dispatched within 2 business days of order shipment. Track via apple.com/orderstatus using your order number."
+  },
+  {
+    "doc_id": 13,
+    "brand": "AppleSupport",
+    "category": "Billing & Payments",
+    "query": "Family Sharing members cannot access iCloud+ storage",
+    "resolution": "The family organizer must navigate to Settings > Family > Subscriptions > iCloud+ and tap 'Share with Family'.",
+    "text": "Brand: AppleSupport | Category: Billing & Payments | Issue: Family Sharing members cannot access iCloud+ storage | Resolution: The family organizer must navigate to Settings > Family > Subscriptions > iCloud+ and tap 'Share with Family'."
+  },
+  {
+    "doc_id": 14,
+    "brand": "AppleSupport",
+    "category": "Technical Support",
+    "query": "App Store error unable to download or update apps",
+    "resolution": "Verify payment method details in Settings > Media & Purchases. Sign out of App Store and sign back in to refresh authorization tokens.",
+    "text": "Brand: AppleSupport | Category: Technical Support | Issue: App Store error unable to download or update apps | Resolution: Verify payment method details in Settings > Media & Purchases. Sign out of App Store and sign back in to refresh authorization tokens."
+  },
+  {
+    "doc_id": 15,
+    "brand": "AppleSupport",
+    "category": "Technical Support",
+    "query": "Magic Keyboard backlight not turning on",
+    "resolution": "Ensure the iPad is securely attached to the Smart Connector. Check Settings > General > Keyboard > Hardware Keyboard to adjust backlight brightness.",
+    "text": "Brand: AppleSupport | Category: Technical Support | Issue: Magic Keyboard backlight not turning on | Resolution: Ensure the iPad is securely attached to the Smart Connector. Check Settings > General > Keyboard > Hardware Keyboard to adjust backlight brightness."
+  },
+  {
+    "doc_id": 16,
+    "brand": "AppleSupport",
+    "category": "Account & Security",
+    "query": "Find My iPhone showing device offline",
+    "resolution": "Devices report offline if powered down or out of cellular/Wi-Fi range. If 'Find My network' is enabled, nearby Apple devices will relay its encrypted location.",
+    "text": "Brand: AppleSupport | Category: Account & Security | Issue: Find My iPhone showing device offline | Resolution: Devices report offline if powered down or out of cellular/Wi-Fi range. If 'Find My network' is enabled, nearby Apple devices will relay its encrypted location."
+  },
+  {
+    "doc_id": 17,
+    "brand": "AppleSupport",
+    "category": "Technical Support",
+    "query": "Camera app showing black viewfinder preview",
+    "resolution": "Close all background camera apps. Switch between front and rear cameras. If issue persists across reboots, hardware inspection at an Apple Store is recommended.",
+    "text": "Brand: AppleSupport | Category: Technical Support | Issue: Camera app showing black viewfinder preview | Resolution: Close all background camera apps. Switch between front and rear cameras. If issue persists across reboots, hardware inspection at an Apple Store is recommended."
+  },
+  {
+    "doc_id": 18,
+    "brand": "AmazonHelp",
+    "category": "Orders & Delivery",
+    "query": "Package marked as delivered but not received",
+    "resolution": "Carriers occasionally mark packages delivered up to 24 hours prior to actual drop-off. Check secure delivery areas, porches, and neighbors. If still missing after 36 hours, request a replacement via 'Your Orders'.",
+    "text": "Brand: AmazonHelp | Category: Orders & Delivery | Issue: Package marked as delivered but not received | Resolution: Carriers occasionally mark packages delivered up to 24 hours prior to actual drop-off. Check secure delivery areas, porches, and neighbors. If still missing after 36 hours, request a replacement via 'Your Orders'."
+  },
+  {
+    "doc_id": 19,
+    "brand": "AmazonHelp",
+    "category": "Orders & Delivery",
+    "query": "How to return an item and get a prepaid shipping label",
+    "resolution": "Navigate to 'Your Orders', select 'Return or Replace Items', choose your return reason, and select drop-off at nearest Kohl's, Whole Foods, or UPS store with no box required.",
+    "text": "Brand: AmazonHelp | Category: Orders & Delivery | Issue: How to return an item and get a prepaid shipping label | Resolution: Navigate to 'Your Orders', select 'Return or Replace Items', choose your return reason, and select drop-off at nearest Kohl's, Whole Foods, or UPS store with no box required."
+  },
+  {
+    "doc_id": 20,
+    "brand": "AmazonHelp",
+    "category": "Billing & Payments",
+    "query": "Unexpected Amazon Prime annual membership renewal charge",
+    "resolution": "Visit 'Manage Prime Membership'. If you have not utilized Prime shipping or streaming benefits since renewal, you can cancel immediately for a full automated refund.",
+    "text": "Brand: AmazonHelp | Category: Billing & Payments | Issue: Unexpected Amazon Prime annual membership renewal charge | Resolution: Visit 'Manage Prime Membership'. If you have not utilized Prime shipping or streaming benefits since renewal, you can cancel immediately for a full automated refund."
+  },
+  {
+    "doc_id": 21,
+    "brand": "AmazonHelp",
+    "category": "Orders & Delivery",
+    "query": "Package damaged in transit with broken contents",
+    "resolution": "Go to 'Your Orders', select the damaged order, click 'Return or Replace Items', upload a photo of the packaging, and an instant replacement will be dispatched.",
+    "text": "Brand: AmazonHelp | Category: Orders & Delivery | Issue: Package damaged in transit with broken contents | Resolution: Go to 'Your Orders', select the damaged order, click 'Return or Replace Items', upload a photo of the packaging, and an instant replacement will be dispatched."
+  },
+  {
+    "doc_id": 22,
+    "brand": "AmazonHelp",
+    "category": "Technical Support",
+    "query": "Amazon Fire TV Stick stuck on loading logo",
+    "resolution": "Disconnect the power adapter from the wall outlet for 60 seconds. Use the official power brick rather than TV USB ports, and restart while holding Select and Play/Pause for 5 seconds.",
+    "text": "Brand: AmazonHelp | Category: Technical Support | Issue: Amazon Fire TV Stick stuck on loading logo | Resolution: Disconnect the power adapter from the wall outlet for 60 seconds. Use the official power brick rather than TV USB ports, and restart while holding Select and Play/Pause for 5 seconds."
+  },
+  {
+    "doc_id": 23,
+    "brand": "AmazonHelp",
+    "category": "Technical Support",
+    "query": "Echo Dot Alexa not responding to voice wake word",
+    "resolution": "Ensure the red microphone mute button is not active. Check device Wi-Fi connectivity in the Alexa app under Devices > Echo & Alexa.",
+    "text": "Brand: AmazonHelp | Category: Technical Support | Issue: Echo Dot Alexa not responding to voice wake word | Resolution: Ensure the red microphone mute button is not active. Check device Wi-Fi connectivity in the Alexa app under Devices > Echo & Alexa."
+  },
+  {
+    "doc_id": 24,
+    "brand": "AmazonHelp",
+    "category": "Account & Security",
+    "query": "Suspicious OTP text message or unauthorized account access",
+    "resolution": "Immediately change your Amazon password and enable Two-Step Verification under 'Login & Security'. Report unauthorized orders via the Amazon Customer Service portal.",
+    "text": "Brand: AmazonHelp | Category: Account & Security | Issue: Suspicious OTP text message or unauthorized account access | Resolution: Immediately change your Amazon password and enable Two-Step Verification under 'Login & Security'. Report unauthorized orders via the Amazon Customer Service portal."
+  },
+  {
+    "doc_id": 25,
+    "brand": "AmazonHelp",
+    "category": "Billing & Payments",
+    "query": "Gift card balance not applying to checkout total",
+    "resolution": "Gift card balances apply automatically to physical goods sold by Amazon. Digital subscriptions or third-party seller currencies may require manual selection during payment selection.",
+    "text": "Brand: AmazonHelp | Category: Billing & Payments | Issue: Gift card balance not applying to checkout total | Resolution: Gift card balances apply automatically to physical goods sold by Amazon. Digital subscriptions or third-party seller currencies may require manual selection during payment selection."
+  },
+  {
+    "doc_id": 26,
+    "brand": "AmazonHelp",
+    "category": "Orders & Delivery",
+    "query": "Change delivery address on an order already placed",
+    "resolution": "If the order has not entered the 'Shipping Soon' phase, update the address in 'Your Orders' > 'Order Details' > 'Change'. Otherwise, request delivery hold via carrier tracking.",
+    "text": "Brand: AmazonHelp | Category: Orders & Delivery | Issue: Change delivery address on an order already placed | Resolution: If the order has not entered the 'Shipping Soon' phase, update the address in 'Your Orders' > 'Order Details' > 'Change'. Otherwise, request delivery hold via carrier tracking."
+  },
+  {
+    "doc_id": 27,
+    "brand": "AmazonHelp",
+    "category": "Billing & Payments",
+    "query": "Double charge appeared on credit card statement",
+    "resolution": "When an order is placed, an authorization hold is placed. The actual charge occurs upon shipment. Authorization holds drop within 3-5 business days depending on your bank.",
+    "text": "Brand: AmazonHelp | Category: Billing & Payments | Issue: Double charge appeared on credit card statement | Resolution: When an order is placed, an authorization hold is placed. The actual charge occurs upon shipment. Authorization holds drop within 3-5 business days depending on your bank."
+  },
+  {
+    "doc_id": 28,
+    "brand": "AmazonHelp",
+    "category": "Technical Support",
+    "query": "Kindle Paperwhite battery dying within 24 hours",
+    "resolution": "Ensure Wi-Fi is toggled to Airplane Mode when reading offline. Large book indexing after download can drain battery temporarily.",
+    "text": "Brand: AmazonHelp | Category: Technical Support | Issue: Kindle Paperwhite battery dying within 24 hours | Resolution: Ensure Wi-Fi is toggled to Airplane Mode when reading offline. Large book indexing after download can drain battery temporarily."
+  },
+  {
+    "doc_id": 29,
+    "brand": "AmazonHelp",
+    "category": "Orders & Delivery",
+    "query": "Locker pickup code expired or lost",
+    "resolution": "Delivery Locker codes remain valid for 3 days. If expired, the package returns to the fulfillment center and a full refund is automatically issued.",
+    "text": "Brand: AmazonHelp | Category: Orders & Delivery | Issue: Locker pickup code expired or lost | Resolution: Delivery Locker codes remain valid for 3 days. If expired, the package returns to the fulfillment center and a full refund is automatically issued."
+  },
+  {
+    "doc_id": 30,
+    "brand": "AmazonHelp",
+    "category": "Account & Security",
+    "query": "Cancel Amazon Music Unlimited subscription",
+    "resolution": "Go to Your Amazon Music Settings in your browser. Under the 'Amazon Music Unlimited' section, select the 'Cancel Subscription' option and confirm.",
+    "text": "Brand: AmazonHelp | Category: Account & Security | Issue: Cancel Amazon Music Unlimited subscription | Resolution: Go to Your Amazon Music Settings in your browser. Under the 'Amazon Music Unlimited' section, select the 'Cancel Subscription' option and confirm."
+  },
+  {
+    "doc_id": 31,
+    "brand": "AmazonHelp",
+    "category": "Orders & Delivery",
+    "query": "Driver left package in the rain without weather protection",
+    "resolution": "Submit delivery feedback via 'Your Orders' > 'How was your delivery?'. If the merchandise is damaged, request an immediate free replacement.",
+    "text": "Brand: AmazonHelp | Category: Orders & Delivery | Issue: Driver left package in the rain without weather protection | Resolution: Submit delivery feedback via 'Your Orders' > 'How was your delivery?'. If the merchandise is damaged, request an immediate free replacement."
+  },
+  {
+    "doc_id": 32,
+    "brand": "AmazonHelp",
+    "category": "Billing & Payments",
+    "query": "How long does a refund take to return to debit card?",
+    "resolution": "Once Amazon processes the refund, debit card refunds typically reflect within 5 to 7 business days, while Amazon gift card balances update within 2-4 hours.",
+    "text": "Brand: AmazonHelp | Category: Billing & Payments | Issue: How long does a refund take to return to debit card? | Resolution: Once Amazon processes the refund, debit card refunds typically reflect within 5 to 7 business days, while Amazon gift card balances update within 2-4 hours."
+  },
+  {
+    "doc_id": 33,
+    "brand": "AmazonHelp",
+    "category": "Technical Support",
+    "query": "Ring Video Doorbell live view failing to stream",
+    "resolution": "Check Ring RSSI Wi-Fi signal strength in the Ring app Device Health. If RSSI exceeds -65, move your Wi-Fi router closer or install a chime extender.",
+    "text": "Brand: AmazonHelp | Category: Technical Support | Issue: Ring Video Doorbell live view failing to stream | Resolution: Check Ring RSSI Wi-Fi signal strength in the Ring app Device Health. If RSSI exceeds -65, move your Wi-Fi router closer or install a chime extender."
+  },
+  {
+    "doc_id": 34,
+    "brand": "AmazonHelp",
+    "category": "Orders & Delivery",
+    "query": "Item missing from multi-item shipment box",
+    "resolution": "Check your packing slip and order status, as multi-item orders are frequently fulfilled from different warehouses in separate boxes.",
+    "text": "Brand: AmazonHelp | Category: Orders & Delivery | Issue: Item missing from multi-item shipment box | Resolution: Check your packing slip and order status, as multi-item orders are frequently fulfilled from different warehouses in separate boxes."
+  },
+  {
+    "doc_id": 35,
+    "brand": "Uber_Support",
+    "category": "Billing & Payments",
+    "query": "Charged a cleaning fee after trip completion",
+    "resolution": "Review your trip receipt in Activity. If you believe a cleaning fee was assessed in error, submit a dispute under 'Help' > 'Trip Issues and Refunds' with photos if available.",
+    "text": "Brand: Uber_Support | Category: Billing & Payments | Issue: Charged a cleaning fee after trip completion | Resolution: Review your trip receipt in Activity. If you believe a cleaning fee was assessed in error, submit a dispute under 'Help' > 'Trip Issues and Refunds' with photos if available."
+  },
+  {
+    "doc_id": 36,
+    "brand": "Uber_Support",
+    "category": "Orders & Delivery",
+    "query": "Uber Eats missing food item or incorrect order",
+    "resolution": "In the Uber Eats app, open 'Activity', select the order, tap 'Help', and select 'Missing or incorrect items'. Refunds are credited to Uber Cash or original payment method immediately.",
+    "text": "Brand: Uber_Support | Category: Orders & Delivery | Issue: Uber Eats missing food item or incorrect order | Resolution: In the Uber Eats app, open 'Activity', select the order, tap 'Help', and select 'Missing or incorrect items'. Refunds are credited to Uber Cash or original payment method immediately."
+  },
+  {
+    "doc_id": 37,
+    "brand": "Uber_Support",
+    "category": "Technical Support",
+    "query": "Lost item left inside vehicle after ride",
+    "resolution": "Open Uber app > Activity > select trip > 'Find lost item' > 'Contact driver about lost item'. If driver does not answer, submit a lost item report for support agent callback.",
+    "text": "Brand: Uber_Support | Category: Technical Support | Issue: Lost item left inside vehicle after ride | Resolution: Open Uber app > Activity > select trip > 'Find lost item' > 'Contact driver about lost item'. If driver does not answer, submit a lost item report for support agent callback."
+  },
+  {
+    "doc_id": 38,
+    "brand": "Uber_Support",
+    "category": "Billing & Payments",
+    "query": "Upfront fare differed from final charged receipt",
+    "resolution": "Upfront fares are adjusted if the pickup/drop-off destination changed, unexpected route tolls were added, or significant wait time occurred prior to trip start.",
+    "text": "Brand: Uber_Support | Category: Billing & Payments | Issue: Upfront fare differed from final charged receipt | Resolution: Upfront fares are adjusted if the pickup/drop-off destination changed, unexpected route tolls were added, or significant wait time occurred prior to trip start."
+  },
+  {
+    "doc_id": 39,
+    "brand": "Uber_Support",
+    "category": "Account & Security",
+    "query": "Driver requested cash payment outside the application",
+    "resolution": "Uber is strictly cashless for safety and trip tracking. Never pay cash to drivers. Report the driver immediately through the trip safety reporting menu.",
+    "text": "Brand: Uber_Support | Category: Account & Security | Issue: Driver requested cash payment outside the application | Resolution: Uber is strictly cashless for safety and trip tracking. Never pay cash to drivers. Report the driver immediately through the trip safety reporting menu."
+  },
+  {
+    "doc_id": 40,
+    "brand": "Uber_Support",
+    "category": "Technical Support",
+    "query": "App GPS location jumping or inaccurate pickup pin",
+    "resolution": "Calibrate location permissions in phone settings to 'Precise Location'. Manually verify street address and cross streets before tapping 'Confirm Pickup'.",
+    "text": "Brand: Uber_Support | Category: Technical Support | Issue: App GPS location jumping or inaccurate pickup pin | Resolution: Calibrate location permissions in phone settings to 'Precise Location'. Manually verify street address and cross streets before tapping 'Confirm Pickup'."
+  },
+  {
+    "doc_id": 41,
+    "brand": "Uber_Support",
+    "category": "Billing & Payments",
+    "query": "Cancel Uber One membership and stop recurring charges",
+    "resolution": "Navigate to Account > Uber One > Manage Membership > End Membership. You retain benefits through the end of the current billing cycle.",
+    "text": "Brand: Uber_Support | Category: Billing & Payments | Issue: Cancel Uber One membership and stop recurring charges | Resolution: Navigate to Account > Uber One > Manage Membership > End Membership. You retain benefits through the end of the current billing cycle."
+  },
+  {
+    "doc_id": 42,
+    "brand": "Uber_Support",
+    "category": "Reservations & Travel",
+    "query": "Driver canceled after waiting 5 minutes and cancellation fee was charged",
+    "resolution": "If the driver was not close to the pickup spot or arrived late, go to 'Help' > 'Review my cancellation fee' for an instant automated adjustment.",
+    "text": "Brand: Uber_Support | Category: Reservations & Travel | Issue: Driver canceled after waiting 5 minutes and cancellation fee was charged | Resolution: If the driver was not close to the pickup spot or arrived late, go to 'Help' > 'Review my cancellation fee' for an instant automated adjustment."
+  },
+  {
+    "doc_id": 43,
+    "brand": "Uber_Support",
+    "category": "Orders & Delivery",
+    "query": "Uber Eats order marked delivered but driver never arrived",
+    "resolution": "Check delivery photo in the app. If food is not at door or building reception, submit an instant report under 'Did not receive order' for full re-order credit.",
+    "text": "Brand: Uber_Support | Category: Orders & Delivery | Issue: Uber Eats order marked delivered but driver never arrived | Resolution: Check delivery photo in the app. If food is not at door or building reception, submit an instant report under 'Did not receive order' for full re-order credit."
+  },
+  {
+    "doc_id": 44,
+    "brand": "Uber_Support",
+    "category": "Account & Security",
+    "query": "Unable to log in due to changed mobile phone number",
+    "resolution": "Select 'I can't sign in' on the login screen, provide your registered email, and complete secondary identity verification via uploaded photo ID.",
+    "text": "Brand: Uber_Support | Category: Account & Security | Issue: Unable to log in due to changed mobile phone number | Resolution: Select 'I can't sign in' on the login screen, provide your registered email, and complete secondary identity verification via uploaded photo ID."
+  },
+  {
+    "doc_id": 45,
+    "brand": "Uber_Support",
+    "category": "Billing & Payments",
+    "query": "Promo code did not apply discount to receipt",
+    "resolution": "Promo codes must be selected prior to requesting the ride. In trip help, select 'My promo code did not apply' to have the discount retroactively credited.",
+    "text": "Brand: Uber_Support | Category: Billing & Payments | Issue: Promo code did not apply discount to receipt | Resolution: Promo codes must be selected prior to requesting the ride. In trip help, select 'My promo code did not apply' to have the discount retroactively credited."
+  },
+  {
+    "doc_id": 46,
+    "brand": "Uber_Support",
+    "category": "Technical Support",
+    "query": "Vehicle did not match the car model shown in app",
+    "resolution": "Never enter a vehicle where the license plate or driver photo does not match the app. Cancel the ride, select 'Vehicle did not match', and report for rider safety.",
+    "text": "Brand: Uber_Support | Category: Technical Support | Issue: Vehicle did not match the car model shown in app | Resolution: Never enter a vehicle where the license plate or driver photo does not match the app. Cancel the ride, select 'Vehicle did not match', and report for rider safety."
+  },
+  {
+    "doc_id": 47,
+    "brand": "Uber_Support",
+    "category": "Reservations & Travel",
+    "query": "Reserve a ride in advance for early airport departure",
+    "resolution": "Tap 'Reserve' on the home screen, enter date and flight time up to 90 days ahead. Drivers are dispatched with guaranteed wait time.",
+    "text": "Brand: Uber_Support | Category: Reservations & Travel | Issue: Reserve a ride in advance for early airport departure | Resolution: Tap 'Reserve' on the home screen, enter date and flight time up to 90 days ahead. Drivers are dispatched with guaranteed wait time."
+  },
+  {
+    "doc_id": 48,
+    "brand": "Uber_Support",
+    "category": "Billing & Payments",
+    "query": "Toll charge added to airport trip receipt",
+    "resolution": "Highway and airport access tolls are automatically calculated based on state toll authorities and added directly to the passenger receipt.",
+    "text": "Brand: Uber_Support | Category: Billing & Payments | Issue: Toll charge added to airport trip receipt | Resolution: Highway and airport access tolls are automatically calculated based on state toll authorities and added directly to the passenger receipt."
+  },
+  {
+    "doc_id": 49,
+    "brand": "Uber_Support",
+    "category": "Orders & Delivery",
+    "query": "Food arrived cold or spilled during delivery",
+    "resolution": "Submit photos of damaged food packaging through 'Activity' > 'Help' > 'Food arrived damaged' for replacement credit.",
+    "text": "Brand: Uber_Support | Category: Orders & Delivery | Issue: Food arrived cold or spilled during delivery | Resolution: Submit photos of damaged food packaging through 'Activity' > 'Help' > 'Food arrived damaged' for replacement credit."
+  },
+  {
+    "doc_id": 50,
+    "brand": "Uber_Support",
+    "category": "Account & Security",
+    "query": "Two-step verification SMS code not arriving",
+    "resolution": "Ensure phone has cellular reception and short-code SMS is not blocked by carrier. Request code delivery via WhatsApp or voice call.",
+    "text": "Brand: Uber_Support | Category: Account & Security | Issue: Two-step verification SMS code not arriving | Resolution: Ensure phone has cellular reception and short-code SMS is not blocked by carrier. Request code delivery via WhatsApp or voice call."
+  },
+  {
+    "doc_id": 51,
+    "brand": "Uber_Support",
+    "category": "Technical Support",
+    "query": "Payment method declined when booking trip",
+    "resolution": "Check bank card expiration or 3D-Secure approval in banking app. Add an alternative payment method like PayPal, Apple Pay, or Google Pay.",
+    "text": "Brand: Uber_Support | Category: Technical Support | Issue: Payment method declined when booking trip | Resolution: Check bank card expiration or 3D-Secure approval in banking app. Add an alternative payment method like PayPal, Apple Pay, or Google Pay."
+  },
+  {
+    "doc_id": 52,
+    "brand": "SpotifyCares",
+    "category": "Technical Support",
+    "query": "Music stops playing when phone screen locks",
+    "resolution": "Turn off Battery Saver mode for Spotify in phone settings. On Android, exclude Spotify from battery optimization. On iOS, enable Background App Refresh.",
+    "text": "Brand: SpotifyCares | Category: Technical Support | Issue: Music stops playing when phone screen locks | Resolution: Turn off Battery Saver mode for Spotify in phone settings. On Android, exclude Spotify from battery optimization. On iOS, enable Background App Refresh."
+  },
+  {
+    "doc_id": 53,
+    "brand": "SpotifyCares",
+    "category": "Billing & Payments",
+    "query": "Spotify Premium charged but account shows Free tier",
+    "resolution": "Log out and log back in to ensure you are logged into the correct account. Check receipt email to verify which username received the premium subscription.",
+    "text": "Brand: SpotifyCares | Category: Billing & Payments | Issue: Spotify Premium charged but account shows Free tier | Resolution: Log out and log back in to ensure you are logged into the correct account. Check receipt email to verify which username received the premium subscription."
+  },
+  {
+    "doc_id": 54,
+    "brand": "SpotifyCares",
+    "category": "Technical Support",
+    "query": "Downloaded songs offline not playing without Wi-Fi",
+    "resolution": "Ensure 'Offline Mode' is toggled ON in Settings > Playback. Verify you have connected online at least once within the past 30 days to validate DRM licenses.",
+    "text": "Brand: SpotifyCares | Category: Technical Support | Issue: Downloaded songs offline not playing without Wi-Fi | Resolution: Ensure 'Offline Mode' is toggled ON in Settings > Playback. Verify you have connected online at least once within the past 30 days to validate DRM licenses."
+  },
+  {
+    "doc_id": 55,
+    "brand": "SpotifyCares",
+    "category": "Technical Support",
+    "query": "Spotify Connect not detecting wireless speakers",
+    "resolution": "Ensure both phone and speakers are connected to the exact same Wi-Fi SSID (2.4GHz vs 5GHz split network issue). Restart Spotify app.",
+    "text": "Brand: SpotifyCares | Category: Technical Support | Issue: Spotify Connect not detecting wireless speakers | Resolution: Ensure both phone and speakers are connected to the exact same Wi-Fi SSID (2.4GHz vs 5GHz split network issue). Restart Spotify app."
+  },
+  {
+    "doc_id": 56,
+    "brand": "SpotifyCares",
+    "category": "Account & Security",
+    "query": "Playlists disappeared or modified unexpectedly",
+    "resolution": "Check account login history on spotify.com/account for unauthorized sessions. Visit spotify.com/account/recover-playlists to restore deleted playlists.",
+    "text": "Brand: SpotifyCares | Category: Account & Security | Issue: Playlists disappeared or modified unexpectedly | Resolution: Check account login history on spotify.com/account for unauthorized sessions. Visit spotify.com/account/recover-playlists to restore deleted playlists."
+  },
+  {
+    "doc_id": 57,
+    "brand": "SpotifyCares",
+    "category": "Billing & Payments",
+    "query": "How to invite family members to Spotify Premium Family",
+    "resolution": "Plan manager must visit spotify.com/account/family, generate an invitation link, and all members must confirm the exact physical home address.",
+    "text": "Brand: SpotifyCares | Category: Billing & Payments | Issue: How to invite family members to Spotify Premium Family | Resolution: Plan manager must visit spotify.com/account/family, generate an invitation link, and all members must confirm the exact physical home address."
+  },
+  {
+    "doc_id": 58,
+    "brand": "SpotifyCares",
+    "category": "Billing & Payments",
+    "query": "Student discount verification failing through SheerID",
+    "resolution": "Ensure your university email and full legal name match institutional enrollment records. Upload an official tuition receipt or student ID schedule.",
+    "text": "Brand: SpotifyCares | Category: Billing & Payments | Issue: Student discount verification failing through SheerID | Resolution: Ensure your university email and full legal name match institutional enrollment records. Upload an official tuition receipt or student ID schedule."
+  },
+  {
+    "doc_id": 59,
+    "brand": "SpotifyCares",
+    "category": "Technical Support",
+    "query": "Songs greyed out or showing 'Track Unavailable'",
+    "resolution": "Tracks may be temporarily unavailable due to licensing restrictions or regional copyright agreements. Check if explicit filter is enabled in Settings.",
+    "text": "Brand: SpotifyCares | Category: Technical Support | Issue: Songs greyed out or showing 'Track Unavailable' | Resolution: Tracks may be temporarily unavailable due to licensing restrictions or regional copyright agreements. Check if explicit filter is enabled in Settings."
+  },
+  {
+    "doc_id": 60,
+    "brand": "SpotifyCares",
+    "category": "Technical Support",
+    "query": "Podcast episodes refusing to download",
+    "resolution": "Clear cache under Settings > Storage > Clear Cache. Ensure device has at least 1GB of free internal flash storage.",
+    "text": "Brand: SpotifyCares | Category: Technical Support | Issue: Podcast episodes refusing to download | Resolution: Clear cache under Settings > Storage > Clear Cache. Ensure device has at least 1GB of free internal flash storage."
+  },
+  {
+    "doc_id": 61,
+    "brand": "SpotifyCares",
+    "category": "Account & Security",
+    "query": "Change email address associated with Spotify",
+    "resolution": "Go to spotify.com/account, edit profile, enter new email address, and confirm verification link sent to both old and new email inboxes.",
+    "text": "Brand: SpotifyCares | Category: Account & Security | Issue: Change email address associated with Spotify | Resolution: Go to spotify.com/account, edit profile, enter new email address, and confirm verification link sent to both old and new email inboxes."
+  },
+  {
+    "doc_id": 62,
+    "brand": "SpotifyCares",
+    "category": "Technical Support",
+    "query": "Audio quality low or crackling during playback",
+    "resolution": "In Settings > Audio Quality, switch streaming quality from Automatic to 'Very High' (320 kbps) and disable 'Normalize Volume'.",
+    "text": "Brand: SpotifyCares | Category: Technical Support | Issue: Audio quality low or crackling during playback | Resolution: In Settings > Audio Quality, switch streaming quality from Automatic to 'Very High' (320 kbps) and disable 'Normalize Volume'."
+  },
+  {
+    "doc_id": 63,
+    "brand": "SpotifyCares",
+    "category": "Technical Support",
+    "query": "Local files not syncing from computer to iPhone",
+    "resolution": "Ensure both computer and mobile phone are on the same Wi-Fi network with firewall allowing port 57621. Enable 'Show Local Files' in desktop settings.",
+    "text": "Brand: SpotifyCares | Category: Technical Support | Issue: Local files not syncing from computer to iPhone | Resolution: Ensure both computer and mobile phone are on the same Wi-Fi network with firewall allowing port 57621. Enable 'Show Local Files' in desktop settings."
+  },
+  {
+    "doc_id": 64,
+    "brand": "SpotifyCares",
+    "category": "Billing & Payments",
+    "query": "Cancel Spotify Premium subscription",
+    "resolution": "Visit spotify.com/account, scroll to 'Your Plan', click 'Change Plan', scroll down to 'Cancel Spotify' and confirm cancellation.",
+    "text": "Brand: SpotifyCares | Category: Billing & Payments | Issue: Cancel Spotify Premium subscription | Resolution: Visit spotify.com/account, scroll to 'Your Plan', click 'Change Plan', scroll down to 'Cancel Spotify' and confirm cancellation."
+  },
+  {
+    "doc_id": 65,
+    "brand": "SpotifyCares",
+    "category": "Technical Support",
+    "query": "Car Thing or CarPlay interface crashing",
+    "resolution": "Update Spotify to latest app store release. In CarPlay settings, forget car connection and reconnect Lightning/USB-C cable directly.",
+    "text": "Brand: SpotifyCares | Category: Technical Support | Issue: Car Thing or CarPlay interface crashing | Resolution: Update Spotify to latest app store release. In CarPlay settings, forget car connection and reconnect Lightning/USB-C cable directly."
+  },
+  {
+    "doc_id": 66,
+    "brand": "SpotifyCares",
+    "category": "Account & Security",
+    "query": "Log out of all devices remotely",
+    "resolution": "Visit your account overview page at spotify.com/account, scroll to the bottom, and click 'Sign out everywhere'.",
+    "text": "Brand: SpotifyCares | Category: Account & Security | Issue: Log out of all devices remotely | Resolution: Visit your account overview page at spotify.com/account, scroll to the bottom, and click 'Sign out everywhere'."
+  },
+  {
+    "doc_id": 67,
+    "brand": "SpotifyCares",
+    "category": "Technical Support",
+    "query": "Lyrics not appearing or syncing with song",
+    "resolution": "Lyrics availability depends on Musixmatch licensing for specific releases. Tap the lyrics preview bar at the bottom of the playback screen.",
+    "text": "Brand: SpotifyCares | Category: Technical Support | Issue: Lyrics not appearing or syncing with song | Resolution: Lyrics availability depends on Musixmatch licensing for specific releases. Tap the lyrics preview bar at the bottom of the playback screen."
+  },
+  {
+    "doc_id": 68,
+    "brand": "SpotifyCares",
+    "category": "Billing & Payments",
+    "query": "PayPal recurring payment agreement inactive",
+    "resolution": "Log into PayPal, check Pre-approved payments under Settings > Payments, and ensure your linked funding bank or card is active.",
+    "text": "Brand: SpotifyCares | Category: Billing & Payments | Issue: PayPal recurring payment agreement inactive | Resolution: Log into PayPal, check Pre-approved payments under Settings > Payments, and ensure your linked funding bank or card is active."
+  },
+  {
+    "doc_id": 69,
+    "brand": "Delta",
+    "category": "Reservations & Travel",
+    "query": "Flight canceled or delayed due to weather compensation",
+    "resolution": "Under EU261 or US DOT guidelines, weather cancellations provide meal/hotel accommodation vouchers when stranded overnight. Rebook online at delta.com/my-trips.",
+    "text": "Brand: Delta | Category: Reservations & Travel | Issue: Flight canceled or delayed due to weather compensation | Resolution: Under EU261 or US DOT guidelines, weather cancellations provide meal/hotel accommodation vouchers when stranded overnight. Rebook online at delta.com/my-trips."
+  },
+  {
+    "doc_id": 70,
+    "brand": "Delta",
+    "category": "Reservations & Travel",
+    "query": "Checked baggage missing or delayed upon arrival",
+    "resolution": "File a report at the Baggage Service Office before leaving the airport to get a File Reference Number. Delta 20-minute bag guarantee offers 2,500 bonus miles.",
+    "text": "Brand: Delta | Category: Reservations & Travel | Issue: Checked baggage missing or delayed upon arrival | Resolution: File a report at the Baggage Service Office before leaving the airport to get a File Reference Number. Delta 20-minute bag guarantee offers 2,500 bonus miles."
+  },
+  {
+    "doc_id": 71,
+    "brand": "Delta",
+    "category": "Reservations & Travel",
+    "query": "Change flight date or time without change fees",
+    "resolution": "Main Cabin and higher tickets originating in North America have zero change fees. Fare differences may apply. Modify directly in the Fly Delta app under 'My Trips'.",
+    "text": "Brand: Delta | Category: Reservations & Travel | Issue: Change flight date or time without change fees | Resolution: Main Cabin and higher tickets originating in North America have zero change fees. Fare differences may apply. Modify directly in the Fly Delta app under 'My Trips'."
+  },
+  {
+    "doc_id": 72,
+    "brand": "Delta",
+    "category": "Billing & Payments",
+    "query": "Request an eCredit refund for unused ticket",
+    "resolution": "Unused non-refundable tickets convert into Delta eCredits valid for 1 year from issue date. Check eCredit balance at delta.com/redeem.",
+    "text": "Brand: Delta | Category: Billing & Payments | Issue: Request an eCredit refund for unused ticket | Resolution: Unused non-refundable tickets convert into Delta eCredits valid for 1 year from issue date. Check eCredit balance at delta.com/redeem."
+  },
+  {
+    "doc_id": 73,
+    "brand": "Delta",
+    "category": "Reservations & Travel",
+    "query": "Selecting seats or upgrading to Comfort+ or First Class",
+    "resolution": "Open seat map in Fly Delta app. Medallion members receive complimentary space-available upgrades starting up to 5 days prior to departure.",
+    "text": "Brand: Delta | Category: Reservations & Travel | Issue: Selecting seats or upgrading to Comfort+ or First Class | Resolution: Open seat map in Fly Delta app. Medallion members receive complimentary space-available upgrades starting up to 5 days prior to departure."
+  },
+  {
+    "doc_id": 74,
+    "brand": "Delta",
+    "category": "Reservations & Travel",
+    "query": "Traveling with pets in cabin guidelines",
+    "resolution": "Small dogs and cats can travel in cabin for a one-way fee. Pet carrier must fit under the seat in front of you. Call reservations to add pet to booking.",
+    "text": "Brand: Delta | Category: Reservations & Travel | Issue: Traveling with pets in cabin guidelines | Resolution: Small dogs and cats can travel in cabin for a one-way fee. Pet carrier must fit under the seat in front of you. Call reservations to add pet to booking."
+  },
+  {
+    "doc_id": 75,
+    "brand": "Delta",
+    "category": "Technical Support",
+    "query": "Fly Delta app boarding pass barcode not loading",
+    "resolution": "Ensure phone has internet or screenshot boarding pass beforehand. Apple Wallet / Google Wallet boarding passes remain accessible offline.",
+    "text": "Brand: Delta | Category: Technical Support | Issue: Fly Delta app boarding pass barcode not loading | Resolution: Ensure phone has internet or screenshot boarding pass beforehand. Apple Wallet / Google Wallet boarding passes remain accessible offline."
+  },
+  {
+    "doc_id": 76,
+    "brand": "Delta",
+    "category": "Account & Security",
+    "query": "SkyMiles missing miles from partner airline flights",
+    "resolution": "Submit a mileage request form at delta.com/requestmiles with your ticket number (starts with 006) and boarding pass details.",
+    "text": "Brand: Delta | Category: Account & Security | Issue: SkyMiles missing miles from partner airline flights | Resolution: Submit a mileage request form at delta.com/requestmiles with your ticket number (starts with 006) and boarding pass details."
+  },
+  {
+    "doc_id": 77,
+    "brand": "Delta",
+    "category": "Reservations & Travel",
+    "query": "Carry-on baggage dimensions and weight allowance",
+    "resolution": "Carry-on baggage must not exceed 22 x 14 x 9 inches. Delta does not have a maximum weight limit for carry-ons on most domestic routes.",
+    "text": "Brand: Delta | Category: Reservations & Travel | Issue: Carry-on baggage dimensions and weight allowance | Resolution: Carry-on baggage must not exceed 22 x 14 x 9 inches. Delta does not have a maximum weight limit for carry-ons on most domestic routes."
+  },
+  {
+    "doc_id": 78,
+    "brand": "Delta",
+    "category": "Reservations & Travel",
+    "query": "Special meal requests for international flights",
+    "resolution": "Request kosher, halal, gluten-free, or vegan meals at least 24 hours prior to scheduled departure through 'My Trips'.",
+    "text": "Brand: Delta | Category: Reservations & Travel | Issue: Special meal requests for international flights | Resolution: Request kosher, halal, gluten-free, or vegan meals at least 24 hours prior to scheduled departure through 'My Trips'."
+  },
+  {
+    "doc_id": 79,
+    "brand": "Delta",
+    "category": "Reservations & Travel",
+    "query": "TSA PreCheck or Known Traveler Number not on boarding pass",
+    "resolution": "Ensure your exact name, birth date, and KTN match your government trusted traveler profile. Re-save profile in Fly Delta app and re-issue boarding pass.",
+    "text": "Brand: Delta | Category: Reservations & Travel | Issue: TSA PreCheck or Known Traveler Number not on boarding pass | Resolution: Ensure your exact name, birth date, and KTN match your government trusted traveler profile. Re-save profile in Fly Delta app and re-issue boarding pass."
+  },
+  {
+    "doc_id": 80,
+    "brand": "Delta",
+    "category": "Technical Support",
+    "query": "In-flight Wi-Fi streaming issues via Viasat",
+    "resolution": "Delta Sync Wi-Fi is free for SkyMiles members on domestic Viasat aircraft. Connect to 'DeltaWiFi.com' and log in with your SkyMiles credentials.",
+    "text": "Brand: Delta | Category: Technical Support | Issue: In-flight Wi-Fi streaming issues via Viasat | Resolution: Delta Sync Wi-Fi is free for SkyMiles members on domestic Viasat aircraft. Connect to 'DeltaWiFi.com' and log in with your SkyMiles credentials."
+  },
+  {
+    "doc_id": 81,
+    "brand": "Delta",
+    "category": "Reservations & Travel",
+    "query": "Same-day confirmed flight standby rules",
+    "resolution": "Same-day standby is available starting 24 hours prior to departure for $75 or complimentary for Diamond, Platinum, and Gold Medallion members.",
+    "text": "Brand: Delta | Category: Reservations & Travel | Issue: Same-day confirmed flight standby rules | Resolution: Same-day standby is available starting 24 hours prior to departure for $75 or complimentary for Diamond, Platinum, and Gold Medallion members."
+  },
+  {
+    "doc_id": 82,
+    "brand": "Delta",
+    "category": "Reservations & Travel",
+    "query": "Traveling with infant in lap documentation",
+    "resolution": "Infants under 2 years can travel free in lap on domestic flights. Government birth certificate verification is required during check-in.",
+    "text": "Brand: Delta | Category: Reservations & Travel | Issue: Traveling with infant in lap documentation | Resolution: Infants under 2 years can travel free in lap on domestic flights. Government birth certificate verification is required during check-in."
+  },
+  {
+    "doc_id": 83,
+    "brand": "Delta",
+    "category": "Billing & Payments",
+    "query": "Duplicate ticket booking cancellation within 24 hours",
+    "resolution": "Delta 24-hour risk-free cancellation policy guarantees a 100% full refund to the original payment method for bookings made at least 7 days before departure.",
+    "text": "Brand: Delta | Category: Billing & Payments | Issue: Duplicate ticket booking cancellation within 24 hours | Resolution: Delta 24-hour risk-free cancellation policy guarantees a 100% full refund to the original payment method for bookings made at least 7 days before departure."
+  },
+  {
+    "doc_id": 84,
+    "brand": "Delta",
+    "category": "Reservations & Travel",
+    "query": "Wheelchair assistance airport transfer request",
+    "resolution": "Request wheelchair assistance in the app under Accessibility Services or notify check-in agents upon arrival at the departure curb.",
+    "text": "Brand: Delta | Category: Reservations & Travel | Issue: Wheelchair assistance airport transfer request | Resolution: Request wheelchair assistance in the app under Accessibility Services or notify check-in agents upon arrival at the departure curb."
+  },
+  {
+    "doc_id": 85,
+    "brand": "NikeSupport",
+    "category": "Orders & Delivery",
+    "query": "Nike SNKRS order draw pending status",
+    "resolution": "SNKRS draws take up to 30 minutes to finalize winners. If selected, confirmation email and credit card charge trigger automatically.",
+    "text": "Brand: NikeSupport | Category: Orders & Delivery | Issue: Nike SNKRS order draw pending status | Resolution: SNKRS draws take up to 30 minutes to finalize winners. If selected, confirmation email and credit card charge trigger automatically."
+  },
+  {
+    "doc_id": 86,
+    "brand": "NikeSupport",
+    "category": "Orders & Delivery",
+    "query": "Nike 60-day trial return policy",
+    "resolution": "Nike members can test shoes and apparel for up to 60 days. If unsatisfied, return even if worn for a 100% refund using the prepaid UPS return label.",
+    "text": "Brand: NikeSupport | Category: Orders & Delivery | Issue: Nike 60-day trial return policy | Resolution: Nike members can test shoes and apparel for up to 60 days. If unsatisfied, return even if worn for a 100% refund using the prepaid UPS return label."
+  },
+  {
+    "doc_id": 87,
+    "brand": "NikeSupport",
+    "category": "Billing & Payments",
+    "query": "Klarna or Affirm installment payment processing",
+    "resolution": "Installment payments are managed directly through Klarna or Affirm. Refunds processed by Nike reflect as credit adjustments on remaining installment schedules.",
+    "text": "Brand: NikeSupport | Category: Billing & Payments | Issue: Klarna or Affirm installment payment processing | Resolution: Installment payments are managed directly through Klarna or Affirm. Refunds processed by Nike reflect as credit adjustments on remaining installment schedules."
+  },
+  {
+    "doc_id": 88,
+    "brand": "NikeSupport",
+    "category": "Technical Support",
+    "query": "Nike Run Club GPS map route inaccurate",
+    "resolution": "Verify NRC has 'Always Allow' location permission. Disable Low Power Mode and avoid thick metal armbands that attenuate GPS signals.",
+    "text": "Brand: NikeSupport | Category: Technical Support | Issue: Nike Run Club GPS map route inaccurate | Resolution: Verify NRC has 'Always Allow' location permission. Disable Low Power Mode and avoid thick metal armbands that attenuate GPS signals."
+  },
+  {
+    "doc_id": 89,
+    "brand": "NikeSupport",
+    "category": "Orders & Delivery",
+    "query": "Shoe size exchange for different colorway or size",
+    "resolution": "Initiate an exchange via nike.com/orders. Select replacement size and Nike ships the new pair as soon as the return package scans at carrier drop-off.",
+    "text": "Brand: NikeSupport | Category: Orders & Delivery | Issue: Shoe size exchange for different colorway or size | Resolution: Initiate an exchange via nike.com/orders. Select replacement size and Nike ships the new pair as soon as the return package scans at carrier drop-off."
+  },
+  {
+    "doc_id": 90,
+    "brand": "NikeSupport",
+    "category": "Account & Security",
+    "query": "Nike Member Birthday 20% discount code not received",
+    "resolution": "Birthday promo codes are dispatched via the Nike app inbox on the first day of your birth month for members who joined at least 30 days prior.",
+    "text": "Brand: NikeSupport | Category: Account & Security | Issue: Nike Member Birthday 20% discount code not received | Resolution: Birthday promo codes are dispatched via the Nike app inbox on the first day of your birth month for members who joined at least 30 days prior."
+  },
+  {
+    "doc_id": 91,
+    "brand": "NikeSupport",
+    "category": "Orders & Delivery",
+    "query": "Package stolen or missing from doorstep",
+    "resolution": "Contact Nike Support with your order number. Nike will verify carrier GPS drop-off coordinates and arrange a replacement shipment or full refund.",
+    "text": "Brand: NikeSupport | Category: Orders & Delivery | Issue: Package stolen or missing from doorstep | Resolution: Contact Nike Support with your order number. Nike will verify carrier GPS drop-off coordinates and arrange a replacement shipment or full refund."
+  },
+  {
+    "doc_id": 92,
+    "brand": "NikeSupport",
+    "category": "Technical Support",
+    "query": "Nike Training Club video workouts not streaming",
+    "resolution": "Restart app and verify internet connection. In NTC settings, select 'Download Workout' to store video files locally on device for offline playback.",
+    "text": "Brand: NikeSupport | Category: Technical Support | Issue: Nike Training Club video workouts not streaming | Resolution: Restart app and verify internet connection. In NTC settings, select 'Download Workout' to store video files locally on device for offline playback."
+  },
+  {
+    "doc_id": 93,
+    "brand": "NikeSupport",
+    "category": "Orders & Delivery",
+    "query": "Nike By You custom sneaker production time",
+    "resolution": "Custom Nike By You footwear requires hand-crafting and typically ships within 4 to 6 weeks from initial order placement.",
+    "text": "Brand: NikeSupport | Category: Orders & Delivery | Issue: Nike By You custom sneaker production time | Resolution: Custom Nike By You footwear requires hand-crafting and typically ships within 4 to 6 weeks from initial order placement."
+  },
+  {
+    "doc_id": 94,
+    "brand": "NikeSupport",
+    "category": "Orders & Delivery",
+    "query": "Cancel Nike order within 30-minute grace window",
+    "resolution": "Orders can be self-canceled online within 30 minutes of placement at nike.com/orders. After 30 minutes, orders enter fulfillment and must be returned.",
+    "text": "Brand: NikeSupport | Category: Orders & Delivery | Issue: Cancel Nike order within 30-minute grace window | Resolution: Orders can be self-canceled online within 30 minutes of placement at nike.com/orders. After 30 minutes, orders enter fulfillment and must be returned."
+  },
+  {
+    "doc_id": 95,
+    "brand": "NikeSupport",
+    "category": "Technical Support",
+    "query": "Adapt self-lacing power shoes not connecting to Bluetooth",
+    "resolution": "Place shoes on Qi charging mat until LED glows solid green. Hold buttons on side of shoe for 5 seconds to initiate Bluetooth pairing.",
+    "text": "Brand: NikeSupport | Category: Technical Support | Issue: Adapt self-lacing power shoes not connecting to Bluetooth | Resolution: Place shoes on Qi charging mat until LED glows solid green. Hold buttons on side of shoe for 5 seconds to initiate Bluetooth pairing."
+  },
+  {
+    "doc_id": 96,
+    "brand": "NikeSupport",
+    "category": "Billing & Payments",
+    "query": "Apple Pay failed authorization on SNKRS release",
+    "resolution": "Ensure Apple Pay default shipping address matches default billing address. Re-authenticate Touch ID / Face ID immediately before draw starts.",
+    "text": "Brand: NikeSupport | Category: Billing & Payments | Issue: Apple Pay failed authorization on SNKRS release | Resolution: Ensure Apple Pay default shipping address matches default billing address. Re-authenticate Touch ID / Face ID immediately before draw starts."
+  },
+  {
+    "doc_id": 97,
+    "brand": "NikeSupport",
+    "category": "Orders & Delivery",
+    "query": "Defective shoe sole separation within 2-year warranty",
+    "resolution": "Nike footwear carries a 2-year manufacturer warranty from manufacturing date on shoe tag. Submit claim at nike.com/claims for merchandise voucher.",
+    "text": "Brand: NikeSupport | Category: Orders & Delivery | Issue: Defective shoe sole separation within 2-year warranty | Resolution: Nike footwear carries a 2-year manufacturer warranty from manufacturing date on shoe tag. Submit claim at nike.com/claims for merchandise voucher."
+  },
+  {
+    "doc_id": 98,
+    "brand": "NikeSupport",
+    "category": "Orders & Delivery",
+    "query": "In-store pickup locker notification",
+    "resolution": "Bring your pickup barcode and photo ID to the Nike retail store. Orders are held at the customer service desk for 7 business days.",
+    "text": "Brand: NikeSupport | Category: Orders & Delivery | Issue: In-store pickup locker notification | Resolution: Bring your pickup barcode and photo ID to the Nike retail store. Orders are held at the customer service desk for 7 business days."
+  },
+  {
+    "doc_id": 99,
+    "brand": "NikeSupport",
+    "category": "Account & Security",
+    "query": "Reset Nike member account password",
+    "resolution": "Visit nike.com/login, select 'Forgot password?', enter account email, and follow link sent to reset your password.",
+    "text": "Brand: NikeSupport | Category: Account & Security | Issue: Reset Nike member account password | Resolution: Visit nike.com/login, select 'Forgot password?', enter account email, and follow link sent to reset your password."
+  },
+  {
+    "doc_id": 100,
+    "brand": "NikeSupport",
+    "category": "Orders & Delivery",
+    "query": "International shipping restrictions for Nike products",
+    "resolution": "Nike orders ship only within the domestic country of the local website. Use the regional country selector to place orders for international delivery.",
+    "text": "Brand: NikeSupport | Category: Orders & Delivery | Issue: International shipping restrictions for Nike products | Resolution: Nike orders ship only within the domestic country of the local website. Use the regional country selector to place orders for international delivery."
+  }
+]
