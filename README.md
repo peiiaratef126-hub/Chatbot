@@ -25,49 +25,49 @@ An end-to-end, portfolio-grade **Customer Support Agentic RAG Chatbot** engineer
 
 ```mermaid
 flowchart TD
-    subgraph Data_Pipeline ["Google Colab and Google Drive (Offline ML Training & Indexing)"]
-        Kaggle["Kaggle Twitter Support Dataset (~1GB)"] -->|Chunked Pandas ETL 50k rows| Colab1["01_data_preparation_colab.ipynb"]
+    subgraph Data_Pipeline ["Google Colab and Google Drive - Offline ML Training & Indexing"]
+        Kaggle["Kaggle Twitter Support Dataset ~1GB"] -->|Chunked Pandas ETL 50k rows| Colab1["01_data_preparation_colab.ipynb"]
         Colab1 -->|50,000 QA Pairs| Drive["Google Drive /chatbot_data/"]
         Drive -->|DA3 Tripartite Dataset 8.1k train / 900 eval| Colab2["02_qlora_finetuning_colab.ipynb"]
-        Colab2 -->|QLoRA 4-bit SFT (507 Steps, 4h 15m)| Adapter["Final LoRA Adapter (Loss: 0.0289, Acc: 98.86%)"]
+        Colab2 -->|QLoRA 4-bit SFT - 507 Steps, 4h 15m| Adapter["Final LoRA Adapter - Loss 0.0289, Acc 98.86%"]
         Drive -->|Extract Canonical Articles| Colab3["03_vector_indexing_colab.ipynb"]
         Colab3 -->|Batch Upsert| QdrantCloud["Qdrant Cloud Free 1GB"]
         Colab3 -->|Offline Export| SampleKB["scripts/data/sample_kb.json"]
     end
 
-    subgraph Frontend_App ["Next.js 14 Web Application (Vercel Edge)"]
-        User["End Customer"] <--> UI["Chat Interface (react-markdown, SSE Client)"]
+    subgraph Frontend_App ["Next.js 14 Web Application - Vercel Edge"]
+        User["End Customer"] <--> UI["Chat Interface - react-markdown, SSE Client"]
         UI --> ThoughtTrace["Live AgentThoughtTrace & Tool Execution Visualizer"]
         UI --> Inspector["Collapsible Knowledge Base Citation Drawer"]
-        UI --> Telemetry["Real-time Metrics Bar (Latency, tok/s, Citations)"]
+        UI --> Telemetry["Real-time Metrics Bar - Latency, tok/s, Citations"]
     end
 
-    subgraph Backend_Service ["FastAPI Service (Hugging Face Spaces :7860)"]
-        UI <-->|POST /api/chat (SSE Stream)| Router["FastAPI Routing & CORS Middleware"]
+    subgraph Backend_Service ["FastAPI Service - Hugging Face Spaces :7860"]
+        UI <-->|POST /api/chat - SSE Stream| Router["FastAPI Routing & CORS Middleware"]
         Router --> FastPath{"Greeting Fast-Path?"}
-        FastPath -->|Yes| GreetingStream["Instant Greeting Stream (<50ms)"]
-        FastPath -->|No| ReAct["Agentic ReAct Loop (max_iterations=2)"]
+        FastPath -->|Yes| GreetingStream["Instant Greeting Stream - sub-50ms"]
+        FastPath -->|No| ReAct["Agentic ReAct Loop - max 2 iterations"]
 
-        ReAct --> Tool1["knowledge_base_search(query, brand)"]
-        ReAct --> Tool2["check_order_status(order_id)"]
-        ReAct --> Tool3["escalate_to_human(reason, brand, urgency)"]
+        ReAct --> Tool1["knowledge_base_search"]
+        ReAct --> Tool2["check_order_status"]
+        ReAct --> Tool3["escalate_to_human"]
 
-        Tool1 --> VectorSvc["Vector Service (Qdrant Cloud / In-Memory Fallback)"]
+        Tool1 --> VectorSvc["Vector Service - Qdrant Cloud / In-Memory Fallback"]
         VectorSvc --> VectorFallback{"Qdrant Configured?"}
         VectorFallback -->|Yes| QdrantCloud
-        VectorFallback -->|No| LocalEmbed["In-Memory Cosine Similarity (sample_kb.json)"]
+        VectorFallback -->|No| LocalEmbed["In-Memory Cosine Similarity - sample_kb.json"]
 
         ReAct --> LLMEngine{"API Key Present?"}
-        LLMEngine -->|Yes| GroqCloud["Groq Cloud API (Llama-3.1-8b @ 300 tok/sec)"]
-        LLMEngine -->|No| MockStream["Zero-Cost Mock Mode Stream (~80 tok/sec)"]
+        LLMEngine -->|Yes| GroqCloud["Groq Cloud API - Llama-3.1-8b @ 300 tok/sec"]
+        LLMEngine -->|No| MockStream["Zero-Cost Mock Mode Stream - ~80 tok/sec"]
 
-        GroqCloud --> EventStream["SSE EventStream (thought, tool_call, tool_result, citation, token, done)"]
+        GroqCloud --> EventStream["SSE EventStream - tokens, citations, metrics"]
         MockStream --> EventStream
     end
 
     subgraph Observability ["Full-Stack Telemetry"]
-        Frontend_App -.->|Traces & Exceptions| SentryHub["Sentry Monitoring Dashboard"]
-        Backend_Service -.->|Distributed Traces & Error Events| SentryHub
+        Frontend_App -.->|Traces and Exceptions| SentryHub["Sentry Monitoring Dashboard"]
+        Backend_Service -.->|Distributed Traces and Error Events| SentryHub
     end
 ```
 
