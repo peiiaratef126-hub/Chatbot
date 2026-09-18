@@ -213,13 +213,13 @@ export function createRAGEventStream(
         });
         sendEvent({
           type: "tool_call",
-          tool: "order_status_checker",
-          input: { identifier: orderId },
+          tool: "check_order_status",
+          input: { order_id: orderId },
         });
         const orderRes = executeOrderStatusTool(orderId);
         sendEvent({
           type: "tool_result",
-          tool: "order_status_checker",
+          tool: "check_order_status",
           output: orderRes,
         });
         toolObservations.push(`Order Logistics Status:\n${JSON.stringify(orderRes, null, 2)}`);
@@ -235,7 +235,7 @@ export function createRAGEventStream(
         sendEvent({
           type: "tool_call",
           tool: "escalate_to_human",
-          input: { reason: userMessage.slice(0, 50), brand },
+          input: { reason: userMessage.slice(0, 50), brand, urgency: "high" },
         });
         const escRes = executeEscalationTool(userMessage, brand);
         sendEvent({
