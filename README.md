@@ -4,6 +4,7 @@
 [![CI Quality Gate](https://github.com/peiiaratef126-hub/Chatbot/actions/workflows/ci.yml/badge.svg)](https://github.com/peiiaratef126-hub/Chatbot/actions/workflows/ci.yml)
 [![Vercel App](https://img.shields.io/badge/Vercel-Live_Production-black?style=flat&logo=vercel)](https://frontend-opal-delta-yz5oct1bu2.vercel.app)
 [![Hugging Face Space](https://img.shields.io/badge/🤗_Hugging_Face-Live_Demo-yellow?style=flat)](https://huggingface.co/spaces/LoneVertex/customer-support-rag-demo)
+[![Sentry](https://img.shields.io/badge/Sentry-Full--Stack_Observability-362D59?style=flat&logo=sentry)](https://arab-open-university-kp.sentry.io)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Groq](https://img.shields.io/badge/Groq-300_tok%2Fsec-f55036?style=flat)](https://groq.com/)
@@ -14,8 +15,9 @@
 > **Live Deployments:**
 > - 🌐 **Production Web Application:** [https://frontend-opal-delta-yz5oct1bu2.vercel.app](https://frontend-opal-delta-yz5oct1bu2.vercel.app)
 > - ⚡ **Hugging Face Space Showcase:** [https://huggingface.co/spaces/LoneVertex/customer-support-rag-demo](https://huggingface.co/spaces/LoneVertex/customer-support-rag-demo)
+> - 🛡️ **Sentry Telemetry Dashboard:** [https://arab-open-university-kp.sentry.io](https://arab-open-university-kp.sentry.io)
 
-An end-to-end, portfolio-grade **Customer Support Agentic RAG Chatbot** engineered for zero-cost deployment. Features a Next.js 14 frontend styled with modern UI design principles, a high-throughput FastAPI backend streaming Server-Sent Events (SSE) at 300 tokens/sec via Groq Cloud, an agentic ReAct loop with multi-tool reasoning, and reproducible Google Colab pipelines leveraging Google Drive.
+An end-to-end, portfolio-grade **Customer Support Agentic RAG Chatbot** engineered for zero-cost deployment. Features a Next.js 14 frontend styled with modern AI SaaS design principles (featuring live `AgentThoughtTrace`), a high-throughput FastAPI backend streaming Server-Sent Events (SSE) at 300 tokens/sec via Groq Cloud, an agentic ReAct loop with multi-tool reasoning, end-to-end Sentry distributed tracing, and reproducible Google Colab pipelines executing **Domain-Anchored Agentic Alignment (DA3)** on `Qwen/Qwen2.5-7B-Instruct`.
 
 ---
 

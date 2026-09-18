@@ -11,14 +11,13 @@ import {
   ChevronDown,
   ChevronUp,
   BookOpen,
-  Wrench,
-  BrainCircuit,
   Zap,
 } from "lucide-react";
 import { KnowledgeCitation, ToolTrace } from "@/lib/api";
 import { formatScore, formatLatency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { AgentThoughtTrace } from "./agent-thought-trace";
 
 export interface ChatMessageItem {
   id: string;
@@ -40,7 +39,6 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
   const isUser = message.role === "user";
   const [copied, setCopied] = useState(false);
   const [showContext, setShowContext] = useState(false);
-  const [showThoughts, setShowThoughts] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(message.content);
@@ -81,57 +79,13 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
         </div>
 
         <div className="flex-1 space-y-2">
-          {/* Agent Thoughts / Tool Calls Accordion */}
+          {/* Agent ReAct Thought & Tool Execution Trace */}
           {hasThoughts && (
-            <div className="rounded-xl border border-border/50 bg-muted/30 overflow-hidden text-xs">
-              <button
-                onClick={() => setShowThoughts(!showThoughts)}
-                className="w-full flex items-center justify-between px-3 py-2 text-muted-foreground hover:text-foreground transition-colors font-mono text-[11px]"
-              >
-                <div className="flex items-center gap-1.5">
-                  <BrainCircuit className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Agent ReAct Trace ({message.tools?.length || 0} tools executed)</span>
-                </div>
-                {showThoughts ? (
-                  <ChevronUp className="w-3.5 h-3.5" />
-                ) : (
-                  <ChevronDown className="w-3.5 h-3.5" />
-                )}
-              </button>
-
-              {showThoughts && (
-                <div className="p-3 border-t border-border/40 space-y-2 font-mono text-[11px] bg-background/50">
-                  {message.thoughts?.map((th, i) => (
-                    <div key={i} className="text-muted-foreground flex items-start gap-1.5">
-                      <span className="text-emerald-500">▶</span>
-                      <span>{th}</span>
-                    </div>
-                  ))}
-
-                  {message.tools?.map((tool, i) => (
-                    <div
-                      key={i}
-                      className="p-2 rounded-lg bg-muted/60 border border-border/40 space-y-1"
-                    >
-                      <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
-                        <Wrench className="w-3 h-3" />
-                        <span>Tool: {tool.tool}</span>
-                      </div>
-                      {tool.input && (
-                        <div className="text-[10px] text-muted-foreground">
-                          Input: {JSON.stringify(tool.input)}
-                        </div>
-                      )}
-                      {tool.output && (
-                        <div className="text-[10px] text-muted-foreground">
-                          Output: {JSON.stringify(tool.output)}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <AgentThoughtTrace
+              thoughts={message.thoughts}
+              tools={message.tools}
+              isStreaming={isStreaming && !message.content}
+            />
           )}
 
           {/* Main Bot Bubble */}

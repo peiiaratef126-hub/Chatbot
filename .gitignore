@@ -65,6 +65,8 @@ pnpm-debug.log*
 # Datasets & Local Vector Storage
 data/raw/
 data/processed/
+data/*.jsonl
+!data/test_samples_10.jsonl
 *.csv
 *.parquet
 qdrant_storage/
@@ -80,3 +82,4 @@ Thumbs.db
 colab_cell_7_fix.txt
 colab_nb3_step7_fix.txt
 Antigravity_Chatbot_Master_Prompt.md
+Antigravity_Chatbot_Master_Prompt2.md
