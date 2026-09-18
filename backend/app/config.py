@@ -36,6 +36,12 @@ class Settings(BaseSettings):
     MOCK_MODE: bool = Field(default=False, description="Force mock responses when external APIs are unavailable")
     MAX_REACT_ITERATIONS: int = Field(default=2, description="Mandatory upper bound on ReAct agent loop iterations")
 
+    # Sentry Observability
+    SENTRY_DSN: str = Field(default="", description="Sentry DSN endpoint for error and performance monitoring")
+    SENTRY_ENVIRONMENT: str = Field(default="development", description="Sentry environment tag (development, production)")
+    SENTRY_TRACES_SAMPLE_RATE: float = Field(default=1.0, description="Sentry transaction trace sample rate")
+    SENTRY_PROFILES_SAMPLE_RATE: float = Field(default=1.0, description="Sentry profile sample rate")
+
     model_config = SettingsConfigDict(
         env_file=(".env", "../.env", "../../.env"),
         env_file_encoding="utf-8",

@@ -2,6 +2,7 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import sentry_sdk
 
 from app.config import get_settings
 from app.routers.chat import router as chat_router
@@ -42,6 +43,19 @@ async def lifespan(app: FastAPI):
 
 settings = get_settings()
 
+# Initialize Sentry SDK before FastAPI app instantiation
+if settings.SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        environment=settings.SENTRY_ENVIRONMENT or settings.ENVIRONMENT,
+        send_default_pii=True,
+        enable_logs=True,
+        traces_sample_rate=settings.SENTRY_TRACES_SAMPLE_RATE,
+        profile_session_sample_rate=settings.SENTRY_PROFILES_SAMPLE_RATE,
+        profile_lifecycle="trace",
+    )
+    logger.info("🛡️ Sentry SDK initialized successfully")
+
 app = FastAPI(
     title="Customer Support RAG Chatbot API",
     description=(
@@ -62,6 +76,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Sentry Verification Endpoint
+@app.get("/sentry-debug")
+async def trigger_sentry_error():
+    """Trigger an intentional ZeroDivisionError to verify Sentry event ingestion."""
+    logger.info("Triggering intentional test exception for Sentry verification...")
+    division_by_zero = 1 / 0
+    return {"status": "unreachable", "result": division_by_zero}
 
 # Register routers
 app.include_router(health_router)
