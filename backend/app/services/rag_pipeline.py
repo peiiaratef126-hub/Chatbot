@@ -162,14 +162,14 @@ class RAGPipeline:
                 if order_pattern:
                     order_num = order_pattern.group(2)
                     yield f"data: {StreamEvent(type='thought', content=f'Detected order tracking request for ID {order_num}.').model_dump_json()}\n\n"
-                    yield f"data: {StreamEvent(type='tool_call', tool='order_status_checker', input={'identifier': order_num}).model_dump_json()}\n\n"
+                    yield f"data: {StreamEvent(type='tool_call', tool='check_order_status', input={'order_id': order_num}).model_dump_json()}\n\n"
                     order_res = self._execute_order_status_tool(order_num)
-                    yield f"data: {StreamEvent(type='tool_result', tool='order_status_checker', output=order_res).model_dump_json()}\n\n"
+                    yield f"data: {StreamEvent(type='tool_result', tool='check_order_status', output=order_res).model_dump_json()}\n\n"
                     tool_observations.append(f"Order Tracking Details:\n{json.dumps(order_res, indent=2)}")
 
                 if escalation_pattern:
                     yield f"data: {StreamEvent(type='thought', content='High urgency or customer escalation request detected. Triggering tier-2 dispatch.').model_dump_json()}\n\n"
-                    yield f"data: {StreamEvent(type='tool_call', tool='escalate_to_human', input={'reason': user_message[:50], 'brand': brand}).model_dump_json()}\n\n"
+                    yield f"data: {StreamEvent(type='tool_call', tool='escalate_to_human', input={'reason': user_message[:50], 'brand': brand, 'urgency': 'high'}).model_dump_json()}\n\n"
                     esc_res = self._execute_escalation_tool(user_message, brand=brand)
                     yield f"data: {StreamEvent(type='tool_result', tool='escalate_to_human', output=esc_res).model_dump_json()}\n\n"
                     tool_observations.append(f"Escalation Dispatch Details:\n{json.dumps(esc_res, indent=2)}")

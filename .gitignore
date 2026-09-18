@@ -1,6 +1,15 @@
-# Environment and secrets
+# ==============================================================================
+# Git Ignore Configuration - SupportRAG (Agentic Customer Support RAG System)
+# Strict Repository Hygiene Post-DA3 Training
+# ==============================================================================
+
+# Environment, Secrets & Credentials
 .env*
 !.env.example
+!backend/.env.example
+!frontend/.env.example
+kaggle.json
+kaggle_access_token
 *.pem
 *.key
 *.p12
@@ -10,7 +19,26 @@
 id_rsa*
 *.pub
 
-# Python
+# ML Weights, Checkpoints & Datasets
+*.gguf
+*.safetensors
+*.bin
+*.pt
+*.pth
+checkpoints/
+run_agentic_v2/
+run_customer_support/
+final_adapter/
+*.csv
+*.jsonl
+*.parquet
+/data/
+qdrant_storage/
+local_qdrant/
+*.tar.gz
+*.zip
+
+# Python & Virtual Environments
 __pycache__/
 *.py[cod]
 *$py.class
@@ -43,10 +71,11 @@ htmlcov/
 # Jupyter / Colab
 .ipynb_checkpoints/
 *-checkpoint.ipynb
+colab_*.txt
 
-# Node.js / Next.js
-frontend/node_modules/
+# Node.js & Next.js Build Outputs
 node_modules/
+frontend/node_modules/
 .next/
 frontend/.next/
 out/
@@ -62,26 +91,13 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Datasets & Local Vector Storage
-data/raw/
-data/processed/
-data/*.jsonl
-!data/test_samples_10.jsonl
-*.csv
-*.parquet
-qdrant_storage/
-local_qdrant/
-*.tar.gz
-*.zip
-
-# OS / Editor
+# OS & Editor
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
-colab_cell_7_fix.txt
-colab_cell_9_fix.txt
-colab_cell_11_fix.txt
-colab_nb3_step7_fix.txt
-Antigravity_Chatbot_Master_Prompt.md
-Antigravity_Chatbot_Master_Prompt2.md
+.vercel/
+frontend/.vercel/
+
+# Antigravity CLI Prompt Directives
+Antigravity_*.md
