@@ -5,7 +5,27 @@ export const dynamic = "force-dynamic";
 
 const startTime = Date.now();
 
-export async function GET() {
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("origin") || "";
+  const allowed =
+    origin.includes("localhost") || origin.endsWith(".vercel.app") || !origin
+      ? origin || "*"
+      : "*";
+  return {
+    "Access-Control-Allow-Origin": allowed,
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  };
+}
+
+export async function OPTIONS(req: Request) {
+  return new Response(null, {
+    status: 204,
+    headers: getCorsHeaders(req),
+  });
+}
+
+export async function GET(req: Request) {
   const hasGroq = Boolean(process.env.GROQ_API_KEY);
   const uptime = (Date.now() - startTime) / 1000;
 
@@ -19,11 +39,17 @@ export async function GET() {
 
   if (qdrantUrl && qdrantApiKey) {
     try {
+      const timeoutSignal =
+        typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function"
+          ? AbortSignal.timeout(5000)
+          : undefined;
+
       const res = await fetch(`${qdrantUrl}/collections/${qdrantCollection}`, {
         headers: {
           "api-key": qdrantApiKey,
         },
         cache: "no-store",
+        signal: timeoutSignal,
       });
       if (res.ok) {
         const data = await res.json();
@@ -36,6 +62,13 @@ export async function GET() {
     } catch {
       // Graceful fallback to sample KB
     }
+  }
+
+  // Fallback to verified in-memory KB status if Qdrant Cloud is unreachable or offline
+  if (!vectorDbConnected && sampleKbArticles.length > 0) {
+    vectorDbConnected = true;
+    vectorDbBackend = "in_memory_sample_kb";
+    indexedDocsCount = sampleKbArticles.length;
   }
 
   return NextResponse.json(
@@ -51,10 +84,7 @@ export async function GET() {
       uptime_seconds: Math.round(uptime * 100) / 100,
     },
     {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, OPTIONS",
-      },
+      headers: getCorsHeaders(req),
     }
   );
 }

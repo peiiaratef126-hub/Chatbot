@@ -24,7 +24,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 logging.basicConfig(
     level=logging.INFO,
@@ -72,7 +72,7 @@ def load_or_generate_synthetic(
     if len(samples) < target_count:
         logger.info(f"Synthesizing {target_count - len(samples)} additional traces to reach 5,400 target...")
         from scripts.generate_agentic_dataset import SyntheticGenerator, load_knowledge_base
-        kb = load_knowledge_base(kb_path or (path.parent.parent / "backend" / "scripts" / "data" / "sample_kb.json"))
+        kb = load_knowledge_base(kb_path or (path.parent.parent / "scripts" / "data" / "sample_kb.json"))
         gen = SyntheticGenerator(api_key=None, kb_articles=kb)
         archetypes = ["knowledge_base_search", "knowledge_base_search", "check_order_status", "escalate_to_human", "multi_tool"]
         while len(samples) < target_count:
@@ -229,7 +229,7 @@ def main():
     parser = argparse.ArgumentParser(description="Assemble DA3 Golden Dataset")
     parser.add_argument("--output-dir", type=str, default="data", help="Output directory for jsonl datasets")
     parser.add_argument("--synthetic", type=str, default="data/da3_synthetic_tool_use_5400.jsonl", help="Synthetic traces file")
-    parser.add_argument("--kb", type=str, default="backend/scripts/data/sample_kb.json", help="Knowledge base JSON file")
+    parser.add_argument("--kb", type=str, default="scripts/data/sample_kb.json", help="Knowledge base JSON file")
     parser.add_argument("--total", type=int, default=9000, help="Total samples to compile")
     args = parser.parse_args()
 

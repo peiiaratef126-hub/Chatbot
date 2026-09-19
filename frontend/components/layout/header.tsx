@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { HealthData } from "@/lib/api";
+import { ALL_BRANDS_FILTER as BRANDS } from "@/lib/constants";
 
 interface HeaderProps {
   health: HealthData | null;
@@ -14,16 +15,6 @@ interface HeaderProps {
   onToggleContextDrawer: () => void;
   isDrawerOpen: boolean;
 }
-
-const BRANDS = [
-  "All Brands",
-  "AppleSupport",
-  "AmazonHelp",
-  "Uber_Support",
-  "SpotifyCares",
-  "Delta",
-  "NikeSupport",
-];
 
 export function Header({
   health,

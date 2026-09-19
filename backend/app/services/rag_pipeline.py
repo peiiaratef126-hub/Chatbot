@@ -113,7 +113,7 @@ class RAGPipeline:
         iteration = 0
 
         # Heuristic Intent Parsing for Tool Selection
-        order_pattern = re.search(r'\b(order|tracking|pkg|shipment|#)\s*([A-Za-z0-9\-_]{5,})\b', user_message, re.IGNORECASE)
+        order_pattern = re.search(r'(?:order|tracking|pkg|shipment)\s*(?:#|id|number)?\s*[:#\-]?\s*([A-Za-z0-9\-_]{4,})|#([A-Za-z0-9\-_]{4,})', user_message, re.IGNORECASE)
         escalation_pattern = any(w in user_message.lower() for w in ["speak to human", "real person", "agent", "fraud", "unacceptable", "lawsuit", "manager"])
 
         while iteration < max_iterations:
@@ -160,7 +160,7 @@ class RAGPipeline:
 
                 # Check if secondary tool is triggered
                 if order_pattern:
-                    order_num = order_pattern.group(2)
+                    order_num = (order_pattern.group(1) or order_pattern.group(2)).lstrip("#-_")
                     yield f"data: {StreamEvent(type='thought', content=f'Detected order tracking request for ID {order_num}.').model_dump_json()}\n\n"
                     yield f"data: {StreamEvent(type='tool_call', tool='check_order_status', input={'order_id': order_num}).model_dump_json()}\n\n"
                     order_res = self._execute_order_status_tool(order_num)

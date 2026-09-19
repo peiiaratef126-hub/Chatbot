@@ -506,7 +506,7 @@ def main():
     parser = argparse.ArgumentParser(description="DA3 Synthetic Agentic Dataset Generator")
     parser.add_argument("--count", type=int, default=5400, help="Target number of samples (60 percent = 5400)")
     parser.add_argument("--output", type=str, default="data/da3_synthetic_tool_use_5400.jsonl", help="Output file path")
-    parser.add_argument("--kb", type=str, default="backend/scripts/data/sample_kb.json", help="Knowledge base JSON path")
+    parser.add_argument("--kb", type=str, default="scripts/data/sample_kb.json", help="Knowledge base JSON path")
     parser.add_argument("--api-key", type=str, default=os.getenv("GROQ_API_KEY", ""), help="Groq Cloud API Key")
     parser.add_argument("--model", type=str, default="qwen/qwen3.8-27b", help="Groq model for generation")
     parser.add_argument("--concurrency", type=int, default=3, help="Concurrent async API calls")

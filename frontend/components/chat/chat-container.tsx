@@ -71,6 +71,51 @@ export function ChatContainer() {
     const collectedThoughts: string[] = [];
     const collectedTools: ToolTrace[] = [];
 
+    // Frame-rate throttle (60fps) to eliminate React rendering stutter at 350+ tok/sec
+    let renderRafId: any = null;
+    let pendingContent = "";
+
+    const scheduleContentFlush = () => {
+      if (renderRafId === null) {
+        if (typeof window !== "undefined" && typeof window.requestAnimationFrame === "function") {
+          renderRafId = window.requestAnimationFrame(() => {
+            renderRafId = null;
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === assistantMessageId
+                  ? { ...msg, content: pendingContent }
+                  : msg
+              )
+            );
+          });
+        } else {
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === assistantMessageId
+                ? { ...msg, content: pendingContent }
+                : msg
+            )
+          );
+        }
+      }
+    };
+
+    const flushContentImmediately = () => {
+      if (renderRafId !== null) {
+        if (typeof window !== "undefined" && typeof window.cancelAnimationFrame === "function") {
+          window.cancelAnimationFrame(renderRafId);
+        }
+        renderRafId = null;
+      }
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === assistantMessageId
+            ? { ...msg, content: pendingContent }
+            : msg
+        )
+      );
+    };
+
     try {
       await streamChatMessage(
         text,
@@ -119,14 +164,8 @@ export function ChatContainer() {
             );
           },
           onToken: (token) => {
-            streamedContent += token;
-            setMessages((prev) =>
-              prev.map((msg) =>
-                msg.id === assistantMessageId
-                  ? { ...msg, content: streamedContent }
-                  : msg
-              )
-            );
+            pendingContent += token;
+            scheduleContentFlush();
           },
           onMetrics: (m) => {
             setMetrics(m);
@@ -139,6 +178,7 @@ export function ChatContainer() {
             );
           },
           onError: (err) => {
+            flushContentImmediately();
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === assistantMessageId
@@ -152,12 +192,14 @@ export function ChatContainer() {
             );
           },
           onDone: () => {
+            flushContentImmediately();
             setIsStreaming(false);
           },
         },
         controller.signal
       );
     } catch (err: any) {
+      flushContentImmediately();
       if (err.name !== "AbortError") {
         setMessages((prev) =>
           prev.map((msg) =>
@@ -173,6 +215,7 @@ export function ChatContainer() {
         );
       }
     } finally {
+      flushContentImmediately();
       setIsStreaming(false);
       abortControllerRef.current = null;
     }

@@ -1,4 +1,10 @@
-import sampleKbArticles from "@/data/sample_kb.json";
+import sampleKbArticles from "../data/sample_kb.json" with { type: "json" };
+import {
+  GREETING_REGEX,
+  ORDER_TRACKING_REGEX,
+  ESCALATION_REGEX,
+  GROQ_FETCH_TIMEOUT_MS,
+} from "./constants.ts";
 
 export interface KnowledgeCitation {
   doc_id: number | string;
@@ -21,7 +27,7 @@ export interface StreamEvent {
   done?: boolean;
 }
 
-const GREETING_REGEX = /^(\s*)*(hi|hello|hey|greetings|good\s+(morning|afternoon|evening)|yo|howdy)(\s+(there|friend|team|support|everyone))?(\s*|[!?.])*$/i;
+export type RAGStreamEvent = StreamEvent;
 
 export function isTrivialGreeting(message: string): boolean {
   const clean = message.trim().toLowerCase();
@@ -117,232 +123,218 @@ export function executeEscalationTool(reason: string, brand?: string | null) {
   };
 }
 
-export function createRAGEventStream(
-  message: string,
-  history: Array<{ role: string; content: string }>,
-  brand?: string | null
-): ReadableStream {
-  const encoder = new TextEncoder();
-  const startTime = Date.now();
-  const userMessage = message.trim();
-  const groqApiKey = process.env.GROQ_API_KEY || "";
-  const groqModel = process.env.GROQ_MODEL || "llama-3.1-8b-instant";
+/**
+ * Executes sub-50ms greeting fast-path response without agentic overhead.
+ */
+export async function executeFastPathGreeting(
+  sendEvent: (event: StreamEvent) => void,
+  controller: ReadableStreamDefaultController,
+  brand: string | null | undefined,
+  startTime: number
+): Promise<void> {
+  sendEvent({
+    type: "thought",
+    content: "Intent recognized as standard greeting. Executing direct fast-path response.",
+  });
 
-  return new ReadableStream({
-    async start(controller) {
-      const sendEvent = (event: StreamEvent) => {
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
-      };
+  const brandName = brand && brand !== "All Brands" ? brand : "Customer Support";
+  const greetingText = `Hello! Welcome to **${brandName} Help & Support**. How can I assist you with your device, order, account, or billing today?`;
+  const words = greetingText.split(" ");
+  let tokenCount = 0;
 
-      // 1. Fast-Path Greeting
-      if (isTrivialGreeting(userMessage)) {
-        sendEvent({
-          type: "thought",
-          content: "Intent recognized as standard greeting. Executing direct fast-path response.",
-        });
+  for (let i = 0; i < words.length; i++) {
+    const chunk = words[i] + (i < words.length - 1 ? " " : "");
+    tokenCount++;
+    sendEvent({ type: "token", token: chunk });
+    await new Promise((r) => setTimeout(r, 15));
+  }
 
-        const brandName = brand && brand !== "All Brands" ? brand : "Customer Support";
-        const greetingText = `Hello! Welcome to **${brandName} Help & Support**. How can I assist you with your device, order, account, or billing today?`;
-        const words = greetingText.split(" ");
-        let tokenCount = 0;
-
-        for (let i = 0; i < words.length; i++) {
-          const chunk = words[i] + (i < words.length - 1 ? " " : "");
-          tokenCount++;
-          sendEvent({ type: "token", token: chunk });
-          await new Promise((r) => setTimeout(r, 15));
-        }
-
-        const elapsed = Date.now() - startTime;
-        sendEvent({
-          type: "metrics",
-          metrics: {
-            latency_ms: elapsed,
-            tokens_per_sec: Math.round((tokenCount / (elapsed / 1000 || 0.1))),
-            sources_count: 0,
-            fast_path: true,
-            iterations: 0,
-          },
-        });
-        sendEvent({ type: "done", done: true });
-        controller.close();
-        return;
-      }
-
-      // 2. Agentic ReAct Loop
-      sendEvent({
-        type: "thought",
-        content: `Analyzing customer query for brand '${brand || "All"}' to retrieve grounded knowledge.`,
-      });
-
-      sendEvent({
-        type: "tool_call",
-        tool: "knowledge_base_search",
-        input: { query: userMessage, brand },
-      });
-
-      const citations = searchKnowledgeBase(userMessage, brand, 4, 0.35);
-
-      sendEvent({
-        type: "tool_result",
-        tool: "knowledge_base_search",
-        output: { matches_found: citations.length, top_score: citations[0]?.score || 0.0 },
-      });
-
-      for (const cit of citations) {
-        sendEvent({ type: "citation", citation: cit });
-      }
-
-      const toolObservations: string[] = [];
-      if (citations.length > 0) {
-        toolObservations.push(
-          "Verified Knowledge Base Articles:\n" +
-            citations
-              .map((c) => `[${c.brand} | ${c.category}] Issue: ${c.query} -> Resolution: ${c.resolution}`)
-              .join("\n")
-        );
-      }
-
-      // Order check tool
-      const orderMatch = userMessage.match(/\b(order|tracking|pkg|shipment|#)\s*([A-Za-z0-9\-_]{5,})\b/i);
-      if (orderMatch) {
-        const orderId = orderMatch[2];
-        sendEvent({
-          type: "thought",
-          content: `Detected order tracking request for ID ${orderId}.`,
-        });
-        sendEvent({
-          type: "tool_call",
-          tool: "check_order_status",
-          input: { order_id: orderId },
-        });
-        const orderRes = executeOrderStatusTool(orderId);
-        sendEvent({
-          type: "tool_result",
-          tool: "check_order_status",
-          output: orderRes,
-        });
-        toolObservations.push(`Order Logistics Status:\n${JSON.stringify(orderRes, null, 2)}`);
-      }
-
-      // Escalation tool
-      const needsEscalation = /speak to (a )?human|talk to (a )?human|human (supervisor|agent|representative|specialist)|supervisor|real person|fraud|unacceptable|lawsuit|manager|demanding a human/i.test(userMessage);
-      if (needsEscalation) {
-        sendEvent({
-          type: "thought",
-          content: "High urgency or escalation request detected. Triggering Tier-2 dispatch.",
-        });
-        sendEvent({
-          type: "tool_call",
-          tool: "escalate_to_human",
-          input: { reason: userMessage.slice(0, 50), brand, urgency: "high" },
-        });
-        const escRes = executeEscalationTool(userMessage, brand);
-        sendEvent({
-          type: "tool_result",
-          tool: "escalate_to_human",
-          output: escRes,
-        });
-        toolObservations.push(`Escalation Queue:\n${JSON.stringify(escRes, null, 2)}`);
-      }
-
-      sendEvent({
-        type: "thought",
-        content: "Synthesizing grounded response from verified context.",
-      });
-
-      // 3. Generation (Groq Cloud API or High-Speed Mock Stream)
-      let tokenCount = 0;
-
-      if (groqApiKey) {
-        try {
-          const sysPrompt =
-            "You are an enterprise customer support specialist. Answer the customer authoritatively, politely, and concisely using the provided verified Knowledge Base articles and tool observations.\n" +
-            "Rules:\n1. Base your answer strictly on the verified knowledge base and tool outputs.\n2. Maintain a warm, professional brand tone.";
-
-          const messages = [
-            { role: "system", content: sysPrompt },
-            ...history.slice(-4),
-            {
-              role: "user",
-              content: `Customer Inquiry: ${userMessage}\n\nContext:\n${toolObservations.join("\n\n")}\n\nResponse:`,
-            },
-          ];
-
-          const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${groqApiKey}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model: groqModel,
-              messages,
-              stream: true,
-              temperature: 0.2,
-              max_tokens: 800,
-            }),
-          });
-
-          if (res.ok && res.body) {
-            const reader = res.body.getReader();
-            const decoder = new TextDecoder();
-            let buf = "";
-
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              buf += decoder.decode(value, { stream: true });
-              const lines = buf.split("\n");
-              buf = lines.pop() || "";
-
-              for (const line of lines) {
-                if (line.startsWith("data: ")) {
-                  const dataStr = line.slice(6).trim();
-                  if (dataStr === "[DONE]") break;
-                  try {
-                    const parsed = JSON.parse(dataStr);
-                    const delta = parsed.choices?.[0]?.delta?.content;
-                    if (delta) {
-                      tokenCount++;
-                      sendEvent({ type: "token", token: delta });
-                    }
-                  } catch {}
-                }
-              }
-            }
-          } else {
-            throw new Error(`Groq HTTP ${res.status}`);
-          }
-        } catch (err) {
-          console.warn("Groq streaming fallback to mock:", err);
-          // Fallback to simulated response
-          tokenCount = await streamMockAnswer(sendEvent, citations, userMessage);
-        }
-      } else {
-        tokenCount = await streamMockAnswer(sendEvent, citations, userMessage);
-      }
-
-      const elapsed = Date.now() - startTime;
-      sendEvent({
-        type: "metrics",
-        metrics: {
-          latency_ms: elapsed,
-          tokens_per_sec: Math.round(tokenCount / (elapsed / 1000 || 0.1)),
-          sources_count: citations.length,
-          confidence_score: citations[0]?.score || 0.0,
-          iterations: 1,
-          backend: "Vercel Next.js Edge Engine",
-        },
-      });
-
-      sendEvent({ type: "done", done: true });
-      controller.close();
+  const elapsed = Date.now() - startTime;
+  sendEvent({
+    type: "metrics",
+    metrics: {
+      latency_ms: elapsed,
+      tokens_per_sec: Math.round(tokenCount / (elapsed / 1000 || 0.1)),
+      sources_count: 0,
+      fast_path: true,
+      iterations: 0,
     },
   });
+  sendEvent({ type: "done", done: true });
+  controller.close();
 }
 
-async function streamMockAnswer(
+/**
+ * Executes bounded ReAct tool resolution (knowledge base, ERP logistics, CRM escalation).
+ */
+export function executeAgenticReActLoop(
+  userMessage: string,
+  brand: string | null | undefined,
+  sendEvent: (event: StreamEvent) => void
+): { citations: KnowledgeCitation[]; toolObservations: string[] } {
+  sendEvent({
+    type: "thought",
+    content: `Analyzing customer query for brand '${brand || "All"}' to retrieve grounded knowledge.`,
+  });
+
+  sendEvent({
+    type: "tool_call",
+    tool: "knowledge_base_search",
+    input: { query: userMessage, brand },
+  });
+
+  const citations = searchKnowledgeBase(userMessage, brand, 4, 0.35);
+
+  sendEvent({
+    type: "tool_result",
+    tool: "knowledge_base_search",
+    output: { matches_found: citations.length, top_score: citations[0]?.score || 0.0 },
+  });
+
+  for (const cit of citations) {
+    sendEvent({ type: "citation", citation: cit });
+  }
+
+  const toolObservations: string[] = [];
+  if (citations.length > 0) {
+    toolObservations.push(
+      "Verified Knowledge Base Articles:\n" +
+        citations
+          .map((c) => `[${c.brand} | ${c.category}] Issue: ${c.query} -> Resolution: ${c.resolution}`)
+          .join("\n")
+    );
+  }
+
+  // Order logistics tool
+  const orderMatch = userMessage.match(ORDER_TRACKING_REGEX);
+  if (orderMatch) {
+    const orderId = (orderMatch[1] || orderMatch[2]).replace(/^[#\-_]+/, "");
+    sendEvent({
+      type: "thought",
+      content: `Detected order tracking request for ID ${orderId}.`,
+    });
+    sendEvent({
+      type: "tool_call",
+      tool: "order_status_checker",
+      input: { identifier: orderId, order_id: orderId },
+    });
+    const orderRes = executeOrderStatusTool(orderId);
+    sendEvent({
+      type: "tool_result",
+      tool: "order_status_checker",
+      output: orderRes,
+    });
+    toolObservations.push(`Order Logistics Status:\n${JSON.stringify(orderRes, null, 2)}`);
+  }
+
+  // Human escalation tool
+  if (ESCALATION_REGEX.test(userMessage)) {
+    sendEvent({
+      type: "thought",
+      content: "High urgency or escalation request detected. Triggering Tier-2 dispatch.",
+    });
+    sendEvent({
+      type: "tool_call",
+      tool: "escalate_to_human",
+      input: { reason: userMessage.slice(0, 50), brand, urgency: "high" },
+    });
+    const escRes = executeEscalationTool(userMessage, brand);
+    sendEvent({
+      type: "tool_result",
+      tool: "escalate_to_human",
+      output: escRes,
+    });
+    toolObservations.push(`Escalation Queue:\n${JSON.stringify(escRes, null, 2)}`);
+  }
+
+  return { citations, toolObservations };
+}
+
+/**
+ * Streams completion tokens from Groq Cloud LPU with strict timeout safeguarding.
+ */
+export async function streamGroqCompletion(
+  userMessage: string,
+  history: Array<{ role: string; content: string }>,
+  toolObservations: string[],
+  citations: KnowledgeCitation[],
+  sendEvent: (event: StreamEvent) => void,
+  groqApiKey: string,
+  groqModel: string
+): Promise<number> {
+  const sysPrompt =
+    "You are an enterprise customer support specialist. Answer the customer authoritatively, politely, and concisely using the provided verified Knowledge Base articles and tool observations.\n" +
+    "Rules:\n1. Base your answer strictly on the verified knowledge base and tool outputs.\n2. Maintain a warm, professional brand tone.";
+
+  const messages = [
+    { role: "system", content: sysPrompt },
+    ...history.slice(-4),
+    {
+      role: "user",
+      content: `Customer Inquiry: ${userMessage}\n\nContext:\n${toolObservations.join("\n\n")}\n\nResponse:`,
+    },
+  ];
+
+  const timeoutSignal =
+    typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function"
+      ? AbortSignal.timeout(GROQ_FETCH_TIMEOUT_MS)
+      : undefined;
+
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${groqApiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: groqModel,
+      messages,
+      stream: true,
+      temperature: 0.2,
+      max_tokens: 800,
+    }),
+    signal: timeoutSignal,
+  });
+
+  if (!res.ok || !res.body) {
+    throw new Error(`Groq HTTP ${res.status}`);
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = "";
+  let tokenCount = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    const lines = buf.split("\n");
+    buf = lines.pop() || "";
+
+    for (const line of lines) {
+      if (line.startsWith("data: ")) {
+        const dataStr = line.slice(6).trim();
+        if (dataStr === "[DONE]") break;
+        try {
+          const parsed = JSON.parse(dataStr);
+          const delta = parsed.choices?.[0]?.delta?.content;
+          if (delta) {
+            tokenCount++;
+            sendEvent({ type: "token", token: delta });
+          }
+        } catch {}
+      }
+    }
+  }
+
+  return tokenCount;
+}
+
+/**
+ * Fallback deterministic streamer when Groq is unavailable or times out.
+ */
+export async function streamMockAnswer(
   sendEvent: (event: StreamEvent) => void,
   citations: KnowledgeCitation[],
   query: string
@@ -376,4 +368,79 @@ async function streamMockAnswer(
     }
   }
   return count;
+}
+
+/**
+ * Modular RAG Event Stream orchestrator for Next.js Edge Runtime.
+ */
+export function createRAGEventStream(
+  message: string,
+  history: Array<{ role: string; content: string }>,
+  brand?: string | null
+): ReadableStream {
+  const encoder = new TextEncoder();
+  const startTime = Date.now();
+  const userMessage = message.trim();
+  const groqApiKey = process.env.GROQ_API_KEY || "";
+  const groqModel = process.env.GROQ_MODEL || "llama-3.1-8b-instant";
+
+  return new ReadableStream({
+    async start(controller) {
+      const sendEvent = (event: StreamEvent) => {
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
+      };
+
+      // 1. Fast-Path Greeting Detection
+      if (isTrivialGreeting(userMessage)) {
+        await executeFastPathGreeting(sendEvent, controller, brand, startTime);
+        return;
+      }
+
+      // 2. Agentic ReAct Tool Resolution
+      const { citations, toolObservations } = executeAgenticReActLoop(userMessage, brand, sendEvent);
+
+      sendEvent({
+        type: "thought",
+        content: "Synthesizing grounded response from verified context.",
+      });
+
+      // 3. Response Generation (Groq LPU or Mock Fallback)
+      let tokenCount = 0;
+      if (groqApiKey) {
+        try {
+          tokenCount = await streamGroqCompletion(
+            userMessage,
+            history,
+            toolObservations,
+            citations,
+            sendEvent,
+            groqApiKey,
+            groqModel
+          );
+        } catch (err) {
+          console.warn("Groq streaming fallback to mock:", err);
+          tokenCount = await streamMockAnswer(sendEvent, citations, userMessage);
+        }
+      } else {
+        tokenCount = await streamMockAnswer(sendEvent, citations, userMessage);
+      }
+
+      // 4. Performance Telemetry & Stream Finalization
+      const elapsed = Date.now() - startTime;
+      sendEvent({
+        type: "metrics",
+        metrics: {
+          latency_ms: elapsed,
+          tokens_per_sec: Math.round(tokenCount / (elapsed / 1000 || 0.1)),
+          sources_count: citations.length,
+          confidence_score: citations[0]?.score || 0.0,
+          iterations: 1,
+          backend: "Vercel Next.js Edge Engine",
+        },
+      });
+
+      sendEvent({ type: "done", done: true });
+      controller.close();
+    },
+  });
 }

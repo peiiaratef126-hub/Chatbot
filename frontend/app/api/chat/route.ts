@@ -3,20 +3,29 @@ import { createRAGEventStream } from "@/lib/rag-engine";
 
 export const dynamic = "force-dynamic";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-};
+function getCorsHeaders(req: NextRequest) {
+  const origin = req.headers.get("origin") || "";
+  const allowed =
+    origin.includes("localhost") || origin.endsWith(".vercel.app") || !origin
+      ? origin || "*"
+      : "*";
 
-export async function OPTIONS() {
+  return {
+    "Access-Control-Allow-Origin": allowed,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  };
+}
+
+export async function OPTIONS(req: NextRequest) {
   return new Response(null, {
     status: 204,
-    headers: corsHeaders,
+    headers: getCorsHeaders(req),
   });
 }
 
 export async function POST(req: NextRequest) {
+  const corsHeaders = getCorsHeaders(req);
   try {
     const body = await req.json();
     const message = body.message || "";

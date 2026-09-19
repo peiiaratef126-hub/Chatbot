@@ -51,13 +51,23 @@ export interface ChatStreamCallbacks {
   onDone?: () => void;
 }
 
+function createTimeoutSignal(ms: number): AbortSignal {
+  if (typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function") {
+    return AbortSignal.timeout(ms);
+  }
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), ms);
+  return controller.signal;
+}
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 export async function fetchHealth(): Promise<HealthData | null> {
   try {
     const res = await fetch(`${API_BASE_URL}/api/health`, {
       headers: { Accept: "application/json" },
-      cache: "no-store"
+      cache: "no-store",
+      signal: createTimeoutSignal(5000),
     });
     if (!res.ok) return null;
     return await res.json();
@@ -70,7 +80,8 @@ export async function fetchSampleArticles(): Promise<KnowledgeCitation[]> {
   try {
     const res = await fetch(`${API_BASE_URL}/api/kb/sample`, {
       headers: { Accept: "application/json" },
-      cache: "no-store"
+      cache: "no-store",
+      signal: createTimeoutSignal(5000),
     });
     if (!res.ok) return [];
     const data = await res.json();
@@ -96,6 +107,8 @@ export async function streamChatMessage(
     stream: true,
   };
 
+  const activeSignal = signal || createTimeoutSignal(30000);
+
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -103,7 +116,7 @@ export async function streamChatMessage(
       Accept: "text/event-stream",
     },
     body: JSON.stringify(payload),
-    signal,
+    signal: activeSignal,
   });
 
   if (!response.ok || !response.body) {

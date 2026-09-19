@@ -27,78 +27,29 @@ class VectorService:
         self._init_qdrant_if_configured()
 
     def _load_local_sample_docs(self):
-        """Loads representative customer support knowledge articles."""
+        """Loads representative customer support knowledge articles from canonical JSON assets."""
         candidate_paths = [
             Path(__file__).resolve().parent.parent.parent.parent / "scripts" / "data" / "sample_kb.json",
+            Path(__file__).resolve().parent.parent.parent.parent / "frontend" / "data" / "sample_kb.json",
             Path(__file__).resolve().parent.parent.parent / "scripts" / "data" / "sample_kb.json",
+            Path(__file__).resolve().parent.parent.parent / "frontend" / "data" / "sample_kb.json",
             Path("scripts/data/sample_kb.json"),
-            Path("/content/sample_kb.json")
+            Path("frontend/data/sample_kb.json"),
+            Path("/content/sample_kb.json"),
         ]
-        
-        loaded = False
+
         for p in candidate_paths:
             if p.exists():
                 try:
                     with open(p, "r", encoding="utf-8") as f:
                         self.local_docs = json.load(f)
                     logger.info(f"Loaded {len(self.local_docs)} sample articles from {p}")
-                    loaded = True
-                    break
+                    return
                 except Exception as e:
                     logger.warning(f"Failed loading {p}: {e}")
 
-        if not loaded or not self.local_docs:
-            logger.info("Initializing embedded default knowledge base articles.")
-            self.local_docs = [
-                {
-                    "doc_id": 1,
-                    "brand": "AppleSupport",
-                    "category": "Technical Support",
-                    "query": "iPhone battery drains rapidly after update",
-                    "resolution": "Check Settings > Battery > Battery Health. Optimize Background App Refresh and allow 48 hours for indexing.",
-                    "text": "AppleSupport iPhone battery rapid drain after iOS update battery health background refresh"
-                },
-                {
-                    "doc_id": 2,
-                    "brand": "AmazonHelp",
-                    "category": "Orders & Delivery",
-                    "query": "Package marked as delivered but missing",
-                    "resolution": "Check around delivery areas, porch, and with neighbors. Carriers can scan up to 24h early. If not found after 36h, request replacement in Your Orders.",
-                    "text": "AmazonHelp package marked delivered not arrived missing porch carrier replacement"
-                },
-                {
-                    "doc_id": 3,
-                    "brand": "Uber_Support",
-                    "category": "Billing & Payments",
-                    "query": "Dispute cleaning fee or unexpected charge",
-                    "resolution": "Go to Activity > Select Trip > Help > Review my fees and fares. Submit photos to dispute cleaning assessments.",
-                    "text": "Uber_Support dispute unexpected cleaning fee receipt fare adjustment"
-                },
-                {
-                    "doc_id": 4,
-                    "brand": "SpotifyCares",
-                    "category": "Technical Support",
-                    "query": "Music stops playing when screen locks",
-                    "resolution": "Disable battery saver for Spotify. On iOS toggle Background App Refresh; on Android exclude from aggressive battery management.",
-                    "text": "SpotifyCares playback stops screen lock background audio battery optimization"
-                },
-                {
-                    "doc_id": 5,
-                    "brand": "Delta",
-                    "category": "Reservations & Travel",
-                    "query": "Flight delayed or baggage missing",
-                    "resolution": "Report missing baggage at Baggage Service Office for a File Reference. Track status online or in Fly Delta app.",
-                    "text": "Delta flight delay cancellation baggage claim baggage service office compensation"
-                },
-                {
-                    "doc_id": 6,
-                    "brand": "NikeSupport",
-                    "category": "Orders & Delivery",
-                    "query": "60-day return policy and shoe exchange",
-                    "resolution": "Nike Members can return items within 60 days even if worn for a 100% refund or exchange using prepaid UPS label.",
-                    "text": "NikeSupport 60-day return trial policy exchange prepaid return label worn shoes"
-                }
-            ]
+        logger.error("Knowledge base sample_kb.json could not be located in any candidate path.")
+        self.local_docs = []
 
     def _init_qdrant_if_configured(self):
         """Attempts to initialize remote Qdrant Cloud client."""

@@ -4,6 +4,15 @@ from typing import List
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 
+SUPPORTED_BRANDS: List[str] = [
+    "AppleSupport",
+    "AmazonHelp",
+    "Uber_Support",
+    "SpotifyCares",
+    "Delta",
+    "NikeSupport",
+]
+
 class Settings(BaseSettings):
     """Global configuration settings loaded from environment variables or .env file."""
     
@@ -50,9 +59,9 @@ class Settings(BaseSettings):
 
     @property
     def cors_origin_list(self) -> List[str]:
-        """Parse comma-separated CORS origins into a sanitized list."""
+        """Parse comma-separated CORS origins into a sanitized list without wildcard fallback."""
         if not self.CORS_ORIGINS:
-            return ["*"]
+            return ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:7860"]
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
 
     @property
