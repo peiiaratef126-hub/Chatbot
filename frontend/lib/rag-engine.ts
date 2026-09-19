@@ -226,7 +226,7 @@ export function createRAGEventStream(
       }
 
       // Escalation tool
-      const needsEscalation = /speak to human|real person|agent|fraud|unacceptable|lawsuit|manager/i.test(userMessage);
+      const needsEscalation = /speak to (a )?human|talk to (a )?human|human (supervisor|agent|representative|specialist)|supervisor|real person|fraud|unacceptable|lawsuit|manager|demanding a human/i.test(userMessage);
       if (needsEscalation) {
         sendEvent({
           type: "thought",
