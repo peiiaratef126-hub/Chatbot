@@ -95,9 +95,12 @@ def main():
         print("[*] Running in local in-memory Qdrant client mode (:memory:)...")
         client = QdrantClient(":memory:")
 
-    # Create collection
     print(f"[*] Recreating collection '{args.collection}' (vector dimension: {dim}, Cosine distance)...")
-    client.recreate_collection(
+    if hasattr(client, "collection_exists") and client.collection_exists(args.collection):
+        client.delete_collection(args.collection)
+    elif hasattr(client, "recreate_collection"):
+        pass
+    client.create_collection(
         collection_name=args.collection,
         vectors_config=models.VectorParams(
             size=dim,
