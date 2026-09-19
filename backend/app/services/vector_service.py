@@ -111,13 +111,26 @@ class VectorService:
             self.qdrant_client = QdrantClient(
                 url=self.settings.QDRANT_URL,
                 api_key=self.settings.QDRANT_API_KEY or None,
-                timeout=5.0
+                timeout=15.0
             )
             # Verify connectivity
             collections = self.qdrant_client.get_collections()
             self.is_connected_to_qdrant = True
             self.backend_type = "qdrant_cloud"
             logger.info(f"Connected to Qdrant Cloud: {self.settings.QDRANT_URL} (Collections: {len(collections.collections)})")
+
+            # Initialize embedder for real semantic retrieval
+            try:
+                from fastembed import TextEmbedding
+                self.embedder = TextEmbedding(self.settings.EMBEDDING_MODEL_NAME)
+                logger.info(f"FastEmbed initialized with model: {self.settings.EMBEDDING_MODEL_NAME}")
+            except Exception:
+                try:
+                    from sentence_transformers import SentenceTransformer
+                    self.embedder = SentenceTransformer(self.settings.EMBEDDING_MODEL_NAME)
+                    logger.info("SentenceTransformer initialized.")
+                except Exception:
+                    self.embedder = None
         except Exception as e:
             logger.warning(f"Could not connect to Qdrant Cloud ({e}). Reverting to in-memory fallback.")
             self.is_connected_to_qdrant = False
@@ -245,11 +258,22 @@ class VectorService:
                 ]
             )
 
+        # Generate dense query embedding vector
+        query_vector = [0.0] * 384
+        if self.embedder is not None:
+            try:
+                if hasattr(self.embedder, "embed"):
+                    query_vector = list(self.embedder.embed([query]))[0].tolist()
+                else:
+                    query_vector = self.embedder.encode(query, normalize_embeddings=True).tolist()
+            except Exception as e_emb:
+                logger.warning(f"Error computing query vector: {e_emb}")
+
         # Cross-version compatibility for qdrant-client (query_points vs search)
         if hasattr(self.qdrant_client, "query_points"):
             res = self.qdrant_client.query_points(
                 collection_name=self.settings.QDRANT_COLLECTION,
-                query=[0.0] * 384,
+                query=query_vector,
                 query_filter=query_filter,
                 limit=top_k,
                 score_threshold=threshold
@@ -258,7 +282,7 @@ class VectorService:
         else:
             hits = self.qdrant_client.search(
                 collection_name=self.settings.QDRANT_COLLECTION,
-                query_vector=[0.0] * 384,  # Dummy if testing without embedder
+                query_vector=query_vector,
                 query_filter=query_filter,
                 limit=top_k,
                 score_threshold=threshold
@@ -281,10 +305,18 @@ class VectorService:
 
     def get_status(self) -> Dict[str, Any]:
         """Returns vector database status and metadata."""
+        count = len(self.local_docs)
+        if self.is_connected_to_qdrant and self.qdrant_client:
+            try:
+                col_info = self.qdrant_client.get_collection(self.settings.QDRANT_COLLECTION)
+                count = col_info.points_count if col_info.points_count is not None else count
+            except Exception:
+                pass
+
         return {
             "connected": self.is_connected_to_qdrant,
             "backend": self.backend_type,
-            "indexed_count": len(self.local_docs),
+            "indexed_count": count,
             "collection_name": self.settings.QDRANT_COLLECTION
         }
 
