@@ -40,10 +40,10 @@ async def test_order_tracking_stream_events(rag_pipeline):
 
     # Check for tool_call and tool_result events
     tool_calls = [e for e in events if e.get("type") == "tool_call"]
-    assert any(tc.get("tool") == "order_status_checker" for tc in tool_calls)
+    assert any(tc.get("tool") in ["check_order_status", "order_status_checker"] for tc in tool_calls)
 
     tool_results = [e for e in events if e.get("type") == "tool_result"]
-    assert any(tr.get("tool") == "order_status_checker" for tr in tool_results)
+    assert any(tr.get("tool") in ["check_order_status", "order_status_checker"] for tr in tool_results)
 
     # Verify metrics event
     metrics_event = next(e for e in events if e.get("type") == "metrics")

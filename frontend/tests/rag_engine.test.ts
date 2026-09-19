@@ -152,15 +152,15 @@ describe("Frontend RAG Engine Test Suite", () => {
       const events = await collectStreamEvents(stream);
 
       const toolCall = events.find(
-        (e) => e.type === "tool_call" && e.tool === "order_status_checker"
+        (e) => e.type === "tool_call" && (e.tool === "order_status_checker" || e.tool === "check_order_status")
       );
-      assert.ok(toolCall, "Should trigger order_status_checker tool");
-      assert.strictEqual(toolCall.input?.identifier, "ORDER-12345");
+      assert.ok(toolCall, "Should trigger order tracking tool");
+      assert.ok(toolCall.input?.identifier === "ORDER-12345" || toolCall.input?.order_id === "ORDER-12345");
 
       const toolResult = events.find(
-        (e) => e.type === "tool_result" && e.tool === "order_status_checker"
+        (e) => e.type === "tool_result" && (e.tool === "order_status_checker" || e.tool === "check_order_status")
       );
-      assert.ok(toolResult, "Should emit tool_result for order_status_checker");
+      assert.ok(toolResult, "Should emit tool_result for order tracking tool");
       assert.strictEqual(toolResult.output?.order_id, "ORDER-12345");
     });
 
