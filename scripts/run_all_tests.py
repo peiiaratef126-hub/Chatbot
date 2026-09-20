@@ -12,8 +12,31 @@ from pathlib import Path
 sys.stdout.reconfigure(encoding="utf-8")
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-PYTHON_EXE = REPO_ROOT / "backend" / "venv" / "Scripts" / "python.exe"
-PYTEST_EXE = REPO_ROOT / "backend" / "venv" / "Scripts" / "pytest.exe"
+is_windows = sys.platform.startswith("win")
+
+def resolve_python():
+    candidates = [
+        REPO_ROOT / "backend" / ".venv" / ("Scripts" if is_windows else "bin") / ("python.exe" if is_windows else "python"),
+        REPO_ROOT / "backend" / "venv" / ("Scripts" if is_windows else "bin") / ("python.exe" if is_windows else "python"),
+    ]
+    for c in candidates:
+        if c.exists():
+            return c
+    return Path(sys.executable)
+
+def resolve_pytest():
+    candidates = [
+        REPO_ROOT / "backend" / ".venv" / ("Scripts" if is_windows else "bin") / ("pytest.exe" if is_windows else "pytest"),
+        REPO_ROOT / "backend" / "venv" / ("Scripts" if is_windows else "bin") / ("pytest.exe" if is_windows else "pytest"),
+    ]
+    for c in candidates:
+        if c.exists():
+            return str(c)
+    return "pytest"
+
+PYTHON_EXE = resolve_python()
+PYTEST_EXE = resolve_pytest()
+BUILD_CMD = "cmd /c npm run build" if is_windows else "npm run build"
 
 def log_header(title):
     print("\n" + "=" * 70)
@@ -65,7 +88,7 @@ def main():
     # 2. Frontend Production Build (Next.js 14 App Router)
     passed, dur = run_step(
         "Frontend Production Build (next build)",
-        "cmd /c npm run build",
+        BUILD_CMD,
         cwd=frontend_dir
     )
     results.append(("Frontend Production Build", passed, dur))
