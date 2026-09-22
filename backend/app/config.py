@@ -40,6 +40,22 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL_NAME: str = Field(default="BAAI/bge-small-en-v1.5", description="Local or cloud embedding model name")
     SCORE_THRESHOLD: float = Field(default=0.60, description="Minimum cosine similarity score to qualify as citation")
     TOP_K: int = Field(default=4, description="Maximum number of context chunks to retrieve")
+
+    # Hybrid Search & FlashRank Reranker (Milestone 1)
+    ENABLE_RERANKER: bool = Field(default=True, description="Enable FlashRank cross-encoder reranker")
+    RERANKER_MODEL_NAME: str = Field(default="ms-marco-TinyBERT-L-2-v2", description="FlashRank model identifier")
+    CANDIDATE_TOP_K: int = Field(default=10, description="Number of candidate chunks retrieved before reranking")
+    RERANK_TOP_N: int = Field(default=3, description="Number of top reranked chunks to retain")
+
+    # Safety Guardrails & PII Sanitizer (Milestone 2)
+    ENABLE_GUARDRAILS: bool = Field(default=True, description="Enable PII masking and prompt injection detection")
+
+    # Corrective RAG (CRAG) & Query Rewriting (Milestone 6)
+    ENABLE_CRAG: bool = Field(default=True, description="Enable Corrective RAG query rewriting fallback")
+    CRAG_CONFIDENCE_THRESHOLD: float = Field(default=0.65, description="Confidence threshold triggering query reformulation")
+
+    # Persistence & Session Storage (Milestone 3 & 8)
+    DATABASE_PATH: str = Field(default="chatbot.db", description="Local SQLite database file path")
     
     # ReAct & Fallback Behavior
     MOCK_MODE: bool = Field(default=False, description="Force mock responses when external APIs are unavailable")

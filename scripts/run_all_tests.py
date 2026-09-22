@@ -93,14 +93,14 @@ def main():
     )
     results.append(("Frontend Production Build", passed, dur))
 
-    # 3. Backend Pytest Suite (FastAPI, VectorService, RAGPipeline, Scripts)
+    # 3. Backend Pytest Suite (FastAPI, VectorService, RAGPipeline, Scripts, RAG Eval)
     backend_dir = REPO_ROOT / "backend"
     passed, dur = run_step(
-        "Backend Pytest Suite (26 tests)",
+        "Backend Pytest Suite (35 tests)",
         f'"{PYTEST_EXE}" tests/ -v',
         cwd=backend_dir
     )
-    results.append(("Backend Pytest Suite (26 tests)", passed, dur))
+    results.append(("Backend Pytest Suite (35 tests)", passed, dur))
 
     # 4. Live Cloud Production Integration Tests
     passed, dur = run_step(

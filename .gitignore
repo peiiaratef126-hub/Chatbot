@@ -35,6 +35,9 @@ final_adapter/
 /data/
 qdrant_storage/
 local_qdrant/
+*.db
+*.sqlite
+*.sqlite3
 *.tar.gz
 *.zip
 

@@ -9,3 +9,5 @@ python-dotenv>=1.0.0,<2.0.0
 pytest>=8.0.0
 pytest-asyncio>=0.23.0
 sentry-sdk[fastapi]>=2.0.0
+flashrank>=0.2.0,<1.0.0
+aiosqlite>=0.20.0,<1.0.0

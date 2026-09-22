@@ -12,6 +12,11 @@ import {
   ChevronUp,
   BookOpen,
   Zap,
+  ThumbsUp,
+  ThumbsDown,
+  Sparkles,
+  Send,
+  X
 } from "lucide-react";
 import { KnowledgeCitation, ToolTrace } from "@/lib/api";
 import { formatScore, formatLatency } from "@/lib/utils";
@@ -33,17 +38,55 @@ export interface ChatMessageItem {
 interface MessageBubbleProps {
   message: ChatMessageItem;
   isStreaming?: boolean;
+  sessionId?: string | null;
+  onFeedback?: (messageId: string, rating: "up" | "down", comment?: string) => void;
 }
 
-export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
+const FEEDBACK_TAGS = [
+  "Hallucination",
+  "Irrelevant info",
+  "Incomplete",
+  "Incorrect advice",
+  "Other"
+];
+
+export function MessageBubble({ message, isStreaming, sessionId, onFeedback }: MessageBubbleProps) {
   const isUser = message.role === "user";
   const [copied, setCopied] = useState(false);
   const [showContext, setShowContext] = useState(false);
+  const [feedbackRating, setFeedbackRating] = useState<"up" | "down" | null>(null);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [selectedTag, setSelectedTag] = useState<string>("");
+  const [customComment, setCustomComment] = useState("");
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(message.content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleThumbsUp = () => {
+    if (feedbackRating === "up") return;
+    setFeedbackRating("up");
+    setShowFeedbackModal(false);
+    onFeedback?.(message.id, "up");
+  };
+
+  const handleThumbsDownClick = () => {
+    if (feedbackRating === "down") {
+      setShowFeedbackModal(!showFeedbackModal);
+      return;
+    }
+    setFeedbackRating("down");
+    setShowFeedbackModal(true);
+  };
+
+  const submitNegativeFeedback = () => {
+    const finalComment = [selectedTag, customComment.trim()].filter(Boolean).join(": ");
+    onFeedback?.(message.id, "down", finalComment || "Downvoted");
+    setShowFeedbackModal(false);
+    setFeedbackSubmitted(true);
   };
 
   if (isUser) {
@@ -96,7 +139,7 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
               </ReactMarkdown>
             </div>
 
-            {/* Bottom Info & Copy Bar */}
+            {/* Bottom Info, Quality Feedback & Action Bar */}
             <div className="flex flex-wrap items-center justify-between gap-2 pt-3 mt-3 border-t border-border/40 text-[11px] text-muted-foreground">
               <div className="flex flex-wrap items-center gap-2">
                 <span>{message.timestamp}</span>
@@ -104,6 +147,11 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
                   <span className="inline-flex items-center gap-1 font-mono text-amber-500 font-medium">
                     <Zap className="w-3 h-3" />
                     {formatLatency(message.latencyMs)}
+                  </span>
+                )}
+                {feedbackSubmitted && (
+                  <span className="text-emerald-500 text-[10px] font-medium flex items-center gap-1">
+                    <Check className="w-2.5 h-2.5" /> Feedback saved
                   </span>
                 )}
               </div>
@@ -116,9 +164,7 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
                     className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors font-medium text-[11px]"
                   >
                     <BookOpen className="w-3 h-3" />
-                    <span>
-                      {message.citations?.length} Verified Sources
-                    </span>
+                    <span>{message.citations?.length} Verified Sources</span>
                     {showContext ? (
                       <ChevronUp className="w-3 h-3" />
                     ) : (
@@ -127,6 +173,37 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
                   </button>
                 )}
 
+                {/* Thumbs Up Feedback */}
+                {!isStreaming && (
+                  <button
+                    onClick={handleThumbsUp}
+                    title="Helpful response"
+                    className={`p-1 rounded-md transition-colors ${
+                      feedbackRating === "up"
+                        ? "text-emerald-500 bg-emerald-500/10"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50 opacity-60 group-hover:opacity-100"
+                    }`}
+                  >
+                    <ThumbsUp className="w-3.5 h-3.5" />
+                  </button>
+                )}
+
+                {/* Thumbs Down Feedback */}
+                {!isStreaming && (
+                  <button
+                    onClick={handleThumbsDownClick}
+                    title="Report issue or unhelpful response"
+                    className={`p-1 rounded-md transition-colors ${
+                      feedbackRating === "down"
+                        ? "text-rose-500 bg-rose-500/10"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50 opacity-60 group-hover:opacity-100"
+                    }`}
+                  >
+                    <ThumbsDown className="w-3.5 h-3.5" />
+                  </button>
+                )}
+
+                {/* Copy Response Button */}
                 <Button
                   variant="ghost"
                   size="icon"
@@ -143,11 +220,64 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
               </div>
             </div>
 
+            {/* Negative Feedback Popover Modal */}
+            {showFeedbackModal && (
+              <div className="mt-3 p-3 rounded-xl border border-border/80 bg-background/95 shadow-md space-y-2.5 animate-fade-in">
+                <div className="flex items-center justify-between text-xs font-semibold text-foreground">
+                  <span>How can we improve this answer?</span>
+                  <button
+                    onClick={() => setShowFeedbackModal(false)}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                
+                {/* Feedback reason chips */}
+                <div className="flex flex-wrap gap-1.5">
+                  {FEEDBACK_TAGS.map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => setSelectedTag(tag === selectedTag ? "" : tag)}
+                      className={`px-2 py-0.5 rounded-md text-[11px] font-medium border transition-colors ${
+                        selectedTag === tag
+                          ? "bg-rose-500/10 border-rose-500 text-rose-500"
+                          : "border-border/60 text-muted-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Optional details (e.g., outdated steps)..."
+                    value={customComment}
+                    onChange={(e) => setCustomComment(e.target.value)}
+                    className="flex-1 bg-muted/30 border border-border/60 rounded-md px-2 py-1 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-rose-500/50"
+                  />
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={submitNegativeFeedback}
+                    className="h-7 px-3 text-xs bg-rose-600 hover:bg-rose-500 text-white rounded-md"
+                  >
+                    Submit
+                  </Button>
+                </div>
+              </div>
+            )}
+
             {/* Collapsible Retrieved Context Inspector Body */}
             {hasCitations && showContext && (
               <div className="mt-3 pt-3 border-t border-border/40 space-y-2 animate-fade-in">
-                <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
                   <span>Grounded Knowledge Base Context</span>
+                  <span className="font-mono text-[10px] text-emerald-500">
+                    FlashRank Reranked
+                  </span>
                 </div>
                 <div className="grid grid-cols-1 gap-2">
                   {message.citations?.map((c) => (
@@ -159,9 +289,16 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
                         <span className="font-mono text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
                           {c.brand}
                         </span>
-                        <Badge variant="success" className="text-[10px]">
-                          {formatScore(c.score)} Match
-                        </Badge>
+                        <div className="flex items-center gap-1.5">
+                          {c.reranked && (
+                            <Badge variant="outline" className="text-[9px] py-0 border-emerald-500/40 text-emerald-500">
+                              <Sparkles className="w-2.5 h-2.5 mr-0.5 inline" /> Reranked
+                            </Badge>
+                          )}
+                          <Badge variant="success" className="text-[10px]">
+                            {formatScore(c.score)} Match
+                          </Badge>
+                        </div>
                       </div>
                       <div className="font-medium text-foreground text-xs">
                         Problem: {c.query}

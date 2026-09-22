@@ -2,8 +2,15 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 
-from app.schemas.chat import ChatRequest, StreamEvent
+from app.schemas.chat import (
+    ChatRequest,
+    StreamEvent,
+    FeedbackRequest,
+    FeedbackResponse,
+    SessionHistoryResponse
+)
 from app.services.rag_pipeline import RAGPipeline, get_rag_pipeline
+from app.services.session_service import SessionService, get_session_service
 
 logger = logging.getLogger("chatbot.routers.chat")
 router = APIRouter(prefix="/api", tags=["Chat & Retrieval"])
@@ -15,7 +22,7 @@ async def chat_endpoint(
 ):
     """
     Main conversational endpoint streaming Server-Sent Events (SSE).
-    Orchestrates RAG retrieval, tool execution, and LLM token generation.
+    Orchestrates RAG retrieval, tool execution, guardrails, and LLM token generation.
     """
     if not request.message.strip():
         raise HTTPException(status_code=400, detail="User message cannot be empty.")
@@ -43,3 +50,33 @@ async def chat_endpoint(
             "X-Accel-Buffering": "no"  # Prevents Nginx/proxy buffer stalling
         }
     )
+
+@router.get("/chat/history/{session_id}", response_model=SessionHistoryResponse)
+async def get_chat_history(
+    session_id: str,
+    session_service: SessionService = Depends(get_session_service)
+):
+    """
+    Retrieves full multi-turn conversational history and grounded citations for a given session.
+    """
+    history = await session_service.get_session_history(session_id)
+    return SessionHistoryResponse(**history)
+
+@router.post("/chat/feedback", response_model=FeedbackResponse)
+async def submit_feedback(
+    payload: FeedbackRequest,
+    session_service: SessionService = Depends(get_session_service)
+):
+    """
+    Records customer thumbs-up / thumbs-down ratings with optional commentary
+    for quality monitoring and future offline DPO dataset extraction.
+    """
+    success = await session_service.save_feedback(
+        session_id=payload.session_id,
+        message_id=payload.message_id,
+        rating=payload.rating,
+        comment=payload.comment
+    )
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to save feedback.")
+    return FeedbackResponse(status="success", message="Feedback recorded successfully")

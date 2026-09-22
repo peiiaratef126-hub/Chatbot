@@ -14,6 +14,7 @@ import {
   PerformanceMetrics,
   KnowledgeCitation,
   ToolTrace,
+  submitFeedback,
 } from "@/lib/api";
 
 export function ChatContainer() {
@@ -23,6 +24,7 @@ export function ChatContainer() {
   const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
   const [health, setHealth] = useState<HealthData | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -122,6 +124,9 @@ export function ChatContainer() {
         messages.map((m) => ({ role: m.role, content: m.content })),
         brandToUse,
         {
+          onSession: (id) => {
+            setSessionId(id);
+          },
           onThought: (content) => {
             collectedThoughts.push(content);
             setMessages((prev) =>
@@ -196,7 +201,8 @@ export function ChatContainer() {
             setIsStreaming(false);
           },
         },
-        controller.signal
+        controller.signal,
+        sessionId
       );
     } catch (err: any) {
       flushContentImmediately();
@@ -219,6 +225,20 @@ export function ChatContainer() {
       setIsStreaming(false);
       abortControllerRef.current = null;
     }
+  };
+
+  const handleFeedback = async (
+    messageId: string,
+    rating: "up" | "down",
+    comment?: string
+  ) => {
+    if (!sessionId) return;
+    await submitFeedback({
+      session_id: sessionId,
+      message_id: messageId,
+      rating,
+      comment,
+    });
   };
 
   const handleStopStreaming = () => {
@@ -261,6 +281,8 @@ export function ChatContainer() {
           isStreaming={isStreaming}
           onSelectPrompt={(p, b) => handleSendMessage(p, b)}
           selectedBrand={selectedBrand}
+          sessionId={sessionId}
+          onFeedback={handleFeedback}
         />
 
         {/* Input Bar */}

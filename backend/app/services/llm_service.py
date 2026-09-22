@@ -146,6 +146,51 @@ class LLMService:
                 yield token
                 await asyncio.sleep(0.012)  # ~80 tokens per second simulation
 
+    async def reformulate_query(self, query: str, brand: Optional[str] = None) -> str:
+        """
+        Fast single-pass query reformulation for Corrective RAG (CRAG).
+        Extracts salient keywords and removes conversational filler.
+        """
+        clean_tokens = [
+            t for t in re.findall(r'\b[a-zA-Z0-9]{3,}\b', query.lower())
+            if t not in {"how", "can", "what", "when", "where", "why", "the", "and", "for", "with", "about", "please", "help", "tell", "know", "issue", "problem"}
+        ]
+        keyword_query = " ".join(clean_tokens)
+
+        if self.settings.is_mock_mode:
+            prefix = f"{brand} " if brand and brand.lower() not in keyword_query else ""
+            return f"{prefix}{keyword_query}".strip() or query
+
+        try:
+            url = f"{self.settings.GROQ_BASE_URL}/chat/completions"
+            prompt = (
+                f"Customer Query: '{query}'\n"
+                f"Target Brand: {brand or 'General'}\n"
+                "Extract 3 to 6 essential search keywords for a knowledge base lookup. "
+                "Output ONLY the keywords separated by spaces, nothing else."
+            )
+            payload = {
+                "model": self.settings.GROQ_MODEL,
+                "messages": [
+                    {"role": "system", "content": "You are a concise search query generator. Output only search keywords."},
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": 0.1,
+                "max_tokens": 50,
+                "stream": False
+            }
+            res = await self.client.post(url, json=payload, timeout=5.0)
+            if res.status_code == 200:
+                data = res.json()
+                reformulated = data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                if reformulated:
+                    return reformulated.replace('"', '').replace('\n', ' ').strip()
+        except Exception as e:
+            logger.warning(f"CRAG LLM reformulation failed ({e}), using heuristic keyword query.")
+
+        prefix = f"{brand} " if brand and brand.lower() not in keyword_query else ""
+        return f"{prefix}{keyword_query}".strip() or query
+
     async def close(self):
         """Cleanly close HTTP client session."""
         if self.client and not self.client.is_closed:

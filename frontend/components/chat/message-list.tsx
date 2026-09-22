@@ -10,6 +10,8 @@ interface MessageListProps {
   isStreaming: boolean;
   onSelectPrompt: (prompt: string, brand?: string) => void;
   selectedBrand: string;
+  sessionId?: string | null;
+  onFeedback?: (messageId: string, rating: "up" | "down", comment?: string) => void;
 }
 
 export function MessageList({
@@ -17,6 +19,8 @@ export function MessageList({
   isStreaming,
   onSelectPrompt,
   selectedBrand,
+  sessionId,
+  onFeedback,
 }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -61,6 +65,8 @@ export function MessageList({
             key={msg.id || idx}
             message={msg}
             isStreaming={isStreaming && idx === messages.length - 1 && msg.role === "assistant"}
+            sessionId={sessionId}
+            onFeedback={onFeedback}
           />
         ))}
         <div ref={bottomRef} />

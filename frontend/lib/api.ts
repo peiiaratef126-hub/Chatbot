@@ -10,6 +10,7 @@ export interface KnowledgeCitation {
   query: string;
   resolution: string;
   score: number;
+  reranked?: boolean;
 }
 
 export interface ToolTrace {
@@ -26,6 +27,8 @@ export interface PerformanceMetrics {
   iterations?: number;
   backend?: string;
   fast_path?: boolean;
+  session_id?: string;
+  reranked?: boolean;
 }
 
 export interface HealthData {
@@ -40,7 +43,28 @@ export interface HealthData {
   uptime_seconds: number;
 }
 
+export interface EscalationItem {
+  ticket_id: string;
+  session_id?: string;
+  brand: string;
+  query: string;
+  reason: string;
+  urgency: string;
+  created_at: string;
+}
+
+export interface FeedbackItem {
+  id?: number;
+  session_id: string;
+  message_id: string;
+  rating: "up" | "down";
+  comment?: string;
+  created_at: string;
+}
+
 export interface ChatStreamCallbacks {
+  onSession?: (sessionId: string) => void;
+  onGuardrail?: (notice: string) => void;
   onThought?: (content: string) => void;
   onToolCall?: (tool: string, input: any) => void;
   onToolResult?: (tool: string, output: any) => void;
@@ -96,7 +120,8 @@ export async function streamChatMessage(
   history: ChatMessage[],
   brand: string | null,
   callbacks: ChatStreamCallbacks,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  sessionId?: string | null
 ): Promise<void> {
   const url = `${API_BASE_URL}/api/chat`;
   
@@ -104,6 +129,7 @@ export async function streamChatMessage(
     message,
     history: history.map((m) => ({ role: m.role, content: m.content })),
     brand: brand && brand !== "All Brands" ? brand : null,
+    session_id: sessionId || null,
     stream: true,
   };
 
@@ -147,6 +173,14 @@ export async function streamChatMessage(
             try {
               const parsed = JSON.parse(dataStr);
               switch (parsed.type) {
+                case "session":
+                  if (parsed.session_id) {
+                    callbacks.onSession?.(parsed.session_id);
+                  }
+                  break;
+                case "guardrail":
+                  callbacks.onGuardrail?.(parsed.content || "Safety policy applied.");
+                  break;
                 case "thought":
                   callbacks.onThought?.(parsed.content || "");
                   break;
@@ -186,5 +220,54 @@ export async function streamChatMessage(
   } finally {
     reader.releaseLock();
     callbacks.onDone?.();
+  }
+}
+
+export async function submitFeedback(payload: {
+  session_id: string;
+  message_id: string;
+  rating: "up" | "down";
+  comment?: string;
+}): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/chat/feedback`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function fetchEscalations(limit: number = 50): Promise<EscalationItem[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/admin/escalations?limit=${limit}`, {
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.escalations || [];
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchFeedback(negativeOnly: boolean = false, limit: number = 50): Promise<FeedbackItem[]> {
+  try {
+    const res = await fetch(
+      `${API_BASE_URL}/api/admin/feedback?negative_only=${negativeOnly}&limit=${limit}`,
+      {
+        headers: { Accept: "application/json" },
+        cache: "no-store",
+      }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.feedback || [];
+  } catch {
+    return [];
   }
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Bot, Sparkles, Layers, Github, ExternalLink } from "lucide-react";
+import Link from "next/link";
+import { Bot, Sparkles, Layers, Github, ExternalLink, ShieldAlert } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -85,6 +86,15 @@ export function Header({
 
         {/* Right Actions */}
         <div className="flex items-center gap-2">
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-input bg-background hover:bg-accent text-muted-foreground hover:text-foreground text-xs font-medium transition-colors"
+            title="Escalations & Feedback Admin Dashboard"
+          >
+            <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
+            <span className="hidden sm:inline">Admin</span>
+          </Link>
+
           <Button
             variant="outline"
             size="sm"

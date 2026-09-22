@@ -23,8 +23,23 @@ class VectorService:
         self.is_connected_to_qdrant = False
         self.backend_type = "in_memory_sample_kb"
         self.local_docs: List[Dict[str, Any]] = []
+        self.ranker = None
         self._load_local_sample_docs()
         self._init_qdrant_if_configured()
+        self._init_reranker_if_configured()
+
+    def _init_reranker_if_configured(self):
+        """Initializes FlashRank cross-encoder reranker for hybrid reranking."""
+        if not getattr(self.settings, "ENABLE_RERANKER", True):
+            logger.info("FlashRank reranker disabled in settings.")
+            return
+        try:
+            from flashrank import Ranker
+            self.ranker = Ranker(model_name=self.settings.RERANKER_MODEL_NAME)
+            logger.info(f"FlashRank Reranker ready with model: {self.settings.RERANKER_MODEL_NAME}")
+        except Exception as e:
+            logger.warning(f"FlashRank Reranker could not be initialized ({e}). Continuing without reranker.")
+            self.ranker = None
 
     def _load_local_sample_docs(self):
         """Loads representative customer support knowledge articles from canonical JSON assets."""
@@ -127,24 +142,70 @@ class VectorService:
         query: str,
         brand: Optional[str] = None,
         top_k: Optional[int] = None,
-        score_threshold: Optional[float] = None
+        score_threshold: Optional[float] = None,
+        enable_rerank: Optional[bool] = None
     ) -> List[KnowledgeCitation]:
         """
         Retrieves top relevant knowledge base articles for a query.
-        Filters by brand if specified and applies score threshold.
+        Combines vector similarity / BM25 token matching with FlashRank cross-encoder reranker.
         """
+        use_rerank = enable_rerank if enable_rerank is not None else (self.settings.ENABLE_RERANKER and self.ranker is not None)
         limit = top_k or self.settings.TOP_K
         threshold = score_threshold or self.settings.SCORE_THRESHOLD
+        candidate_limit = max(self.settings.CANDIDATE_TOP_K, limit * 2) if use_rerank else limit
+        candidate_threshold = min(threshold, 0.20) if use_rerank else threshold
 
-        # If connected to Qdrant Cloud, query remote collection
+        # 1. Retrieve initial candidate chunks (via Qdrant Cloud or in-memory BM25 fallback)
         if self.is_connected_to_qdrant and self.qdrant_client:
             try:
-                return await self._search_qdrant(query, brand, limit, threshold)
+                candidates = await self._search_qdrant(query, brand, candidate_limit, candidate_threshold)
             except Exception as e:
                 logger.error(f"Qdrant query failed: {e}. Falling back to in-memory search.")
+                candidates = self._search_in_memory(query, brand, candidate_limit, candidate_threshold)
+        else:
+            candidates = self._search_in_memory(query, brand, candidate_limit, candidate_threshold)
 
-        # In-Memory Search Fallback
-        return self._search_in_memory(query, brand, limit, threshold)
+        if not candidates:
+            return []
+
+        # 2. Cross-Encoder FlashRank Reranker (Milestone 1)
+        if use_rerank and self.ranker:
+            try:
+                from flashrank import RerankRequest
+                passages = [
+                    {
+                        "id": i,
+                        "text": f"{c.brand} {c.category}: {c.query} - {c.resolution}",
+                        "citation": c
+                    }
+                    for i, c in enumerate(candidates)
+                ]
+                rerank_req = RerankRequest(query=query, passages=passages)
+                reranked_results = self.ranker.rerank(rerank_req)
+
+                target_n = top_k or self.settings.RERANK_TOP_N
+                reranked_citations: List[KnowledgeCitation] = []
+                for item in reranked_results[:target_n]:
+                    orig = item["citation"]
+                    raw_score = float(item.get("score", orig.score))
+                    norm_score = max(0.0, min(1.0, raw_score))
+                    reranked_citations.append(
+                        KnowledgeCitation(
+                            doc_id=orig.doc_id,
+                            brand=orig.brand,
+                            category=orig.category,
+                            query=orig.query,
+                            resolution=orig.resolution,
+                            score=round(norm_score, 4),
+                            reranked=True
+                        )
+                    )
+                if reranked_citations:
+                    return reranked_citations
+            except Exception as e_rr:
+                logger.warning(f"FlashRank reranking failed ({e_rr}). Preserving candidate order.")
+
+        return candidates[:limit]
 
     def _search_in_memory(
         self,
@@ -268,7 +329,9 @@ class VectorService:
             "connected": self.is_connected_to_qdrant,
             "backend": self.backend_type,
             "indexed_count": count,
-            "collection_name": self.settings.QDRANT_COLLECTION
+            "collection_name": self.settings.QDRANT_COLLECTION,
+            "reranker_active": bool(self.ranker is not None),
+            "reranker_model": self.settings.RERANKER_MODEL_NAME if self.ranker is not None else None
         }
 
 _vector_service_instance: Optional[VectorService] = None
