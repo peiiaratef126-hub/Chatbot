@@ -35,6 +35,7 @@ class SessionService:
                 CREATE TABLE IF NOT EXISTS sessions (
                     session_id TEXT PRIMARY KEY,
                     brand TEXT,
+                    language TEXT,
                     created_at TEXT NOT NULL,
                     updated_at TEXT NOT NULL
                 )
@@ -68,9 +69,20 @@ class SessionService:
                     query TEXT NOT NULL,
                     reason TEXT NOT NULL,
                     urgency TEXT NOT NULL,
+                    language TEXT DEFAULT 'en',
                     created_at TEXT NOT NULL
                 )
             """)
+            # Safe schema migrations for existing databases
+            try:
+                await db.execute("ALTER TABLE sessions ADD COLUMN language TEXT")
+            except Exception:
+                pass
+            try:
+                await db.execute("ALTER TABLE escalations ADD COLUMN language TEXT DEFAULT 'en'")
+            except Exception:
+                pass
+
             await db.execute("CREATE INDEX IF NOT EXISTS idx_messages_session ON messages(session_id)")
             await db.execute("CREATE INDEX IF NOT EXISTS idx_feedback_session ON feedback(session_id)")
             await db.commit()
@@ -81,17 +93,25 @@ class SessionService:
     def _now_iso(self) -> str:
         return datetime.now(timezone.utc).isoformat()
 
-    async def get_or_create_session(self, session_id: Optional[str] = None, brand: Optional[str] = None) -> str:
+    async def get_or_create_session(
+        self,
+        session_id: Optional[str] = None,
+        brand: Optional[str] = None,
+        language: Optional[str] = None
+    ) -> str:
         """Returns existing session or creates a new one with a distinct UUID."""
         await self.init_db()
         now = self._now_iso()
 
         if session_id:
             async with aiosqlite.connect(self.db_path) as db:
-                async with db.execute("SELECT session_id FROM sessions WHERE session_id = ?", (session_id,)) as cursor:
+                async with db.execute("SELECT session_id, language FROM sessions WHERE session_id = ?", (session_id,)) as cursor:
                     row = await cursor.fetchone()
                     if row:
-                        await db.execute("UPDATE sessions SET updated_at = ? WHERE session_id = ?", (now, session_id))
+                        if language:
+                            await db.execute("UPDATE sessions SET updated_at = ?, language = ? WHERE session_id = ?", (now, language, session_id))
+                        else:
+                            await db.execute("UPDATE sessions SET updated_at = ? WHERE session_id = ?", (now, session_id))
                         await db.commit()
                         return session_id
 
@@ -99,8 +119,8 @@ class SessionService:
         new_id = session_id or f"sess_{uuid.uuid4().hex[:12]}"
         async with aiosqlite.connect(self.db_path) as db:
             await db.execute(
-                "INSERT OR REPLACE INTO sessions (session_id, brand, created_at, updated_at) VALUES (?, ?, ?, ?)",
-                (new_id, brand, now, now)
+                "INSERT OR REPLACE INTO sessions (session_id, brand, language, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+                (new_id, brand, language or "en", now, now)
             )
             await db.commit()
         return new_id
@@ -158,9 +178,16 @@ class SessionService:
                     "created_at": row["created_at"]
                 })
 
+            lang = "en"
+            try:
+                lang = sess_row["language"] or "en"
+            except Exception:
+                pass
+
             return {
                 "session_id": sess_row["session_id"],
                 "brand": sess_row["brand"],
+                "language": lang,
                 "created_at": sess_row["created_at"],
                 "messages": messages
             }
@@ -191,18 +218,19 @@ class SessionService:
         brand: str,
         query: str,
         reason: str,
-        urgency: str = "high"
+        urgency: str = "high",
+        language: Optional[str] = "en"
     ) -> bool:
         """Logs a customer support escalation event."""
         await self.init_db()
         now = self._now_iso()
         async with aiosqlite.connect(self.db_path) as db:
             await db.execute(
-                "INSERT OR REPLACE INTO escalations (ticket_id, session_id, brand, query, reason, urgency, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (ticket_id, session_id, brand, query, reason, urgency, now)
+                "INSERT OR REPLACE INTO escalations (ticket_id, session_id, brand, query, reason, urgency, language, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (ticket_id, session_id, brand, query, reason, urgency, language or "en", now)
             )
             await db.commit()
-        logger.info(f"Escalation logged: ticket {ticket_id} for brand {brand}")
+        logger.info(f"Escalation logged: ticket {ticket_id} for brand {brand} (language={language})")
         return True
 
     async def get_escalations(self, limit: int = 50) -> List[Dict[str, Any]]:
@@ -212,7 +240,13 @@ class SessionService:
             db.row_factory = aiosqlite.Row
             async with db.execute("SELECT * FROM escalations ORDER BY created_at DESC LIMIT ?", (limit,)) as cur:
                 rows = await cur.fetchall()
-                return [dict(row) for row in rows]
+                results = []
+                for row in rows:
+                    item = dict(row)
+                    if "language" not in item or not item["language"]:
+                        item["language"] = "en"
+                    results.append(item)
+                return results
 
     async def get_feedback(self, negative_only: bool = False, limit: int = 50) -> List[Dict[str, Any]]:
         """Retrieves recent user feedback ratings for admin evaluation."""

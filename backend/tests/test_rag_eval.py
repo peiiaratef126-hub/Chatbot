@@ -194,3 +194,120 @@ async def test_crag_reformulation(rag_pipeline):
     assert len(reformulated.strip()) > 0
     # Conversational noise should be minimized
     assert "please" not in reformulated.lower()
+
+# ------------------------------------------------------------------------------
+# 7. Strict Bilingual Support & Cross-Lingual RAG Tests (Milestone 1)
+# ------------------------------------------------------------------------------
+
+def test_strict_bilingual_language_detection(guardrails):
+    """Verify whitelist allows Arabic and English, rejecting all other languages."""
+    # Whitelisted languages
+    ar_res = guardrails.evaluate("بطارية جهازي بتخلص بسرعة")
+    assert ar_res.is_blocked is False
+    assert ar_res.detected_language == "ar"
+    assert ar_res.is_supported_language is True
+
+    en_res = guardrails.evaluate("My order hasn't arrived")
+    assert en_res.is_blocked is False
+    assert en_res.detected_language == "en"
+    assert en_res.is_supported_language is True
+
+    # Unsupported foreign languages
+    unsupported_samples = [
+        "Bonjour, mon téléphone est cassé",  # French
+        "Hola, mi teléfono está roto",        # Spanish
+        "Hallo, mein Handy ist kaputt",       # German
+        "Привет, мой телефон сломался",       # Russian
+        "你好，我想查我的订单",                      # Chinese
+    ]
+    for sample in unsupported_samples:
+        res = guardrails.evaluate(sample)
+        assert res.is_blocked is True, f"Failed to reject unsupported language for: {sample}"
+        assert res.block_reason == "unsupported_language"
+        assert "عذراً، الدعم الفني متوفر حالياً باللغتين العربية والإنجليزية فقط" in res.safe_response
+        assert "Sorry, customer support is currently available in Arabic and English only" in res.safe_response
+
+@pytest.mark.asyncio
+async def test_cross_lingual_vector_retrieval(vector_service):
+    """Verify Arabic query correctly retrieves English knowledge base document via semantic mapping."""
+    results = await vector_service.search(
+        query="بطارية جهازي بتخلص بسرعة",
+        brand="AppleSupport",
+        top_k=3
+    )
+    assert len(results) > 0
+    # Top result should match iPhone battery issue (doc_id=1)
+    assert results[0].doc_id == 1
+    assert "battery" in results[0].query.lower()
+
+@pytest.mark.asyncio
+async def test_arabic_query_stream_response(rag_pipeline):
+    """Verify an Arabic customer query produces a fluent Arabic response in the SSE stream."""
+    import re
+    req = ChatRequest(message="بطارية جهازي بتخلص بسرعة", brand="AppleSupport")
+    tokens = []
+    has_metrics = False
+    metric_lang = None
+
+    async for chunk in rag_pipeline.execute_stream(req):
+        if chunk.startswith("data: "):
+            import json
+            data = json.loads(chunk[6:].strip())
+            if data["type"] == "token":
+                tokens.append(data.get("token", ""))
+            elif data["type"] == "metrics":
+                has_metrics = True
+                metric_lang = data.get("metrics", {}).get("language")
+
+    full_text = "".join(tokens)
+    assert len(full_text) > 0
+    # Must contain Arabic characters
+    assert bool(re.search(r'[\u0600-\u06FF]', full_text)), f"Response was not Arabic: {full_text}"
+    assert has_metrics is True
+    assert metric_lang == "ar"
+
+@pytest.mark.asyncio
+async def test_english_query_stream_response(rag_pipeline):
+    """Verify an English customer query produces an English response in the SSE stream."""
+    req = ChatRequest(message="My order hasn't arrived", brand="AmazonHelp")
+    tokens = []
+    has_metrics = False
+    metric_lang = None
+
+    async for chunk in rag_pipeline.execute_stream(req):
+        if chunk.startswith("data: "):
+            import json
+            data = json.loads(chunk[6:].strip())
+            if data["type"] == "token":
+                tokens.append(data.get("token", ""))
+            elif data["type"] == "metrics":
+                has_metrics = True
+                metric_lang = data.get("metrics", {}).get("language")
+
+    full_text = "".join(tokens)
+    assert len(full_text) > 0
+    assert "resolution" in full_text.lower() or "support" in full_text.lower() or "order" in full_text.lower()
+    assert has_metrics is True
+    assert metric_lang == "en"
+
+@pytest.mark.asyncio
+async def test_unsupported_language_stream_rejection(rag_pipeline):
+    """Verify unsupported language (e.g. French) is immediately rejected with bilingual notice."""
+    req = ChatRequest(message="Bonjour, mon téléphone est cassé", brand="AppleSupport")
+    tokens = []
+    guardrail_event_emitted = False
+
+    async for chunk in rag_pipeline.execute_stream(req):
+        if chunk.startswith("data: "):
+            import json
+            data = json.loads(chunk[6:].strip())
+            if data["type"] == "guardrail":
+                guardrail_event_emitted = True
+            elif data["type"] == "token":
+                tokens.append(data.get("token", ""))
+
+    full_text = "".join(tokens)
+    assert guardrail_event_emitted is True
+    assert "عذراً" in full_text
+    assert "Sorry" in full_text
+

@@ -50,6 +50,7 @@ export interface EscalationItem {
   query: string;
   reason: string;
   urgency: string;
+  language?: string;
   created_at: string;
 }
 
@@ -121,7 +122,8 @@ export async function streamChatMessage(
   brand: string | null,
   callbacks: ChatStreamCallbacks,
   signal?: AbortSignal,
-  sessionId?: string | null
+  sessionId?: string | null,
+  language?: string | null
 ): Promise<void> {
   const url = `${API_BASE_URL}/api/chat`;
   
@@ -130,6 +132,7 @@ export async function streamChatMessage(
     history: history.map((m) => ({ role: m.role, content: m.content })),
     brand: brand && brand !== "All Brands" ? brand : null,
     session_id: sessionId || null,
+    language: language || null,
     stream: true,
   };
 

@@ -11,15 +11,17 @@ from app.schemas.chat import ChatMessage
 
 logger = logging.getLogger("chatbot.llm_service")
 
-# Common greeting triggers for fast-path intent routing
+# Common greeting triggers for fast-path intent routing (English & Arabic)
 GREETING_PATTERNS = [
-    r"^(\s*)*(hi|hello|hey|greetings|good\s+(morning|afternoon|evening)|yo|howdy)(\s+(there|friend|team|support|everyone))?(\s*|[!?.])*$"
+    r"^(\s*)*(hi|hello|hey|greetings|good\s+(morning|afternoon|evening)|yo|howdy)(\s+(there|friend|team|support|everyone))?(\s*|[!?.])*$",
+    r"^\s*(مرحبا|مرحباً|اهلا|أهلا|أهلاً|السلام\s+عليكم|صباح\s+الخير|مساء\s+الخير|هاي|أهلاً\s+وسهلاً)(\s+.*)?\s*[!؟?.]*\s*$"
 ]
 
 class LLMService:
     """
     Asynchronous LLM service interfacing with Groq Cloud API
     with instant greeting fast-path and full offline mock streaming.
+    Supports strict bilingual operations (Arabic & English).
     """
 
     def __init__(self):
@@ -40,20 +42,27 @@ class LLMService:
     def is_trivial_greeting(self, message: str) -> bool:
         """Determines if the message is a trivial greeting to route to fast-path."""
         clean_msg = message.strip().lower()
-        if len(clean_msg) < 3:
+        if len(clean_msg) < 3 and not bool(re.search(r'[\u0600-\u06FF]', clean_msg)):
             return True
         for pattern in GREETING_PATTERNS:
             if re.match(pattern, clean_msg, re.IGNORECASE):
                 return True
         return False
 
-    async def stream_fastpath_greeting(self, brand: Optional[str] = None) -> AsyncGenerator[str, None]:
-        """Sub-millisecond streaming response for simple greetings without invoking RAG tools."""
-        brand_name = brand if brand else "Customer Support"
-        greeting_text = (
-            f"Hello! Welcome to **{brand_name} Help & Support**. "
-            "How can I assist you with your device, order, account, or billing today?"
-        )
+    async def stream_fastpath_greeting(self, brand: Optional[str] = None, language: str = "en") -> AsyncGenerator[str, None]:
+        """Sub-millisecond streaming response for simple greetings in customer's preferred language."""
+        if language == "ar":
+            brand_name = brand if brand else "مركز الدعم الفني"
+            greeting_text = (
+                f"أهلاً بك! مرحباً بك في مركز مساعدة ودعم **{brand_name}**. "
+                "كيف يمكنني مساعدتك في استفسارات جهازك، طلبك، حسابك أو الدعم الفني اليوم؟"
+            )
+        else:
+            brand_name = brand if brand else "Customer Support"
+            greeting_text = (
+                f"Hello! Welcome to **{brand_name} Help & Support**. "
+                "How can I assist you with your device, order, account, or billing today?"
+            )
         words = greeting_text.split(" ")
         for i, word in enumerate(words):
             chunk = word + (" " if i < len(words) - 1 else "")
@@ -130,15 +139,29 @@ class LLMService:
                 last_user_msg = m.get("content", "")
                 break
 
-        # Generate intelligent contextual mock response
-        response_text = (
-            "I have reviewed your request and checked our verified support policies. "
-            "Here is the standard resolution procedure:\n\n"
-            "1. **Verification & Diagnostics:** Ensure your account details and device firmware are updated to the latest release.\n"
-            "2. **Resolution Step:** If this involves an active order or transaction, please reference your confirmation number. For hardware issues, a device restart or network cache reset often resolves the problem immediately.\n"
-            "3. **Next Actions:** If the condition persists after following these steps, our support team can initiate a formal replacement or billing inquiry for you.\n\n"
-            "Please let me know if you need further clarification!"
-        )
+        # Check if the user inquiry is in Arabic
+        is_arabic = bool(re.search(r'[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]', last_user_msg))
+
+        if is_arabic:
+            response_text = (
+                "لقد قمت بمراجعة استفسارك وفحص سياسات الدعم الفني المعتمدة لدينا. "
+                "إليك خطوات الحل القياسية الموصى بها:\n\n"
+                "1. **الفحص والتشخيص الأولي:** تأكد من تحديث حسابك ونظام تشغيل جهازك إلى أحدث إصدار متوفر.\n"
+                "2. **خطوات الحل الفني:** إذا كان استفسارك يتعلق بطلب أو شحنة، يرجى الاستدلال برقم التتبع أو معرف الطلب (Order ID). "
+                "وبالنسبة لمشاكل البطارية أو الجهاز، فإن إعادة تشغيل الجهاز وضبط التطبيقات في الخلفية (Background App Refresh) "
+                "عبر الإعدادات (Settings) يساعد في تحسين الأداء وحل المشكلة بشكل فوري.\n"
+                "3. **الإجراءات التالية:** إذا استمرت المشكلة بعد اتباع هذه الخطوات، يمكن لفريق الدعم تصعيد تذكرتك أو بدء إجراءات الاسترجاع والبدل.\n\n"
+                "يرجى إعلامي إذا كنت بحاجة إلى مزيد من المساعدة!"
+            )
+        else:
+            response_text = (
+                "I have reviewed your request and checked our verified support policies. "
+                "Here is the standard resolution procedure:\n\n"
+                "1. **Verification & Diagnostics:** Ensure your account details and device firmware are updated to the latest release.\n"
+                "2. **Resolution Step:** If this involves an active order or transaction, please reference your confirmation number. For hardware issues, a device restart or network cache reset often resolves the problem immediately.\n"
+                "3. **Next Actions:** If the condition persists after following these steps, our support team can initiate a formal replacement or billing inquiry for you.\n\n"
+                "Please let me know if you need further clarification!"
+            )
 
         tokens = re.split(r'(\s+)', response_text)
         for token in tokens:
@@ -149,8 +172,21 @@ class LLMService:
     async def reformulate_query(self, query: str, brand: Optional[str] = None) -> str:
         """
         Fast single-pass query reformulation for Corrective RAG (CRAG).
-        Extracts salient keywords and removes conversational filler.
+        Extracts salient keywords, handles cross-lingual expansions, and removes filler.
         """
+        # Arabic query reformulation
+        if bool(re.search(r'[\u0600-\u06FF]', query)):
+            from app.services.vector_service import VectorService
+            terms: List[str] = []
+            for ar_k, en_v in VectorService.ARABIC_TO_ENGLISH_SEMANTIC_MAP.items():
+                if ar_k in query:
+                    terms.extend(en_v)
+            if terms:
+                prefix = f"{brand} " if brand else ""
+                unique_terms = list(dict.fromkeys(terms))
+                return f"{prefix}{query} {' '.join(unique_terms)}".strip()
+            return f"{brand or ''} {query}".strip()
+
         clean_tokens = [
             t for t in re.findall(r'\b[a-zA-Z0-9]{3,}\b', query.lower())
             if t not in {"how", "can", "what", "when", "where", "why", "the", "and", "for", "with", "about", "please", "help", "tell", "know", "issue", "problem"}

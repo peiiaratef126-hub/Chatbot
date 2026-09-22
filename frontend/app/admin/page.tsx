@@ -199,6 +199,7 @@ export default function AdminDashboardPage() {
                       <tr>
                         <th className="px-4 py-3 font-semibold">Ticket ID</th>
                         <th className="px-4 py-3 font-semibold">Brand</th>
+                        <th className="px-4 py-3 font-semibold">Language</th>
                         <th className="px-4 py-3 font-semibold">Customer Inquiry</th>
                         <th className="px-4 py-3 font-semibold">Reason</th>
                         <th className="px-4 py-3 font-semibold">Urgency</th>
@@ -215,6 +216,18 @@ export default function AdminDashboardPage() {
                             <span className="px-2 py-0.5 rounded bg-muted font-medium text-[11px]">
                               {esc.brand}
                             </span>
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <Badge
+                              variant="outline"
+                              className={`text-[10px] font-mono px-1.5 py-0 ${
+                                esc.language === "ar"
+                                  ? "border-emerald-500/40 text-emerald-500 bg-emerald-500/10"
+                                  : "border-blue-500/40 text-blue-500 bg-blue-500/10"
+                              }`}
+                            >
+                              {esc.language ? esc.language.toUpperCase() : "EN"}
+                            </Badge>
                           </td>
                           <td className="px-4 py-3 max-w-xs truncate text-foreground font-medium">
                             {esc.query}

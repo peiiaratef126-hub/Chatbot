@@ -47,8 +47,12 @@ class Settings(BaseSettings):
     CANDIDATE_TOP_K: int = Field(default=10, description="Number of candidate chunks retrieved before reranking")
     RERANK_TOP_N: int = Field(default=3, description="Number of top reranked chunks to retain")
 
-    # Safety Guardrails & PII Sanitizer (Milestone 2)
+    # Safety Guardrails & PII Sanitizer (Milestone 2 & Milestone 3)
     ENABLE_GUARDRAILS: bool = Field(default=True, description="Enable PII masking and prompt injection detection")
+
+    # Strict Bilingual Support (Arabic & English Only - Milestone 1)
+    ENABLE_LANGUAGE_FILTER: bool = Field(default=True, description="Strict bilingual AR/EN enforcement")
+    SUPPORTED_LANGUAGES: List[str] = Field(default=["ar", "en"], description="List of officially supported language codes")
 
     # Corrective RAG (CRAG) & Query Rewriting (Milestone 6)
     ENABLE_CRAG: bool = Field(default=True, description="Enable Corrective RAG query rewriting fallback")

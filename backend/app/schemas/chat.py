@@ -11,6 +11,7 @@ class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1, description="Latest user question or support inquiry")
     history: List[ChatMessage] = Field(default_factory=list, description="Prior conversation context")
     brand: Optional[str] = Field(default=None, description="Optional target brand filter (e.g. AppleSupport, AmazonHelp)")
+    language: Optional[str] = Field(default=None, description="Optional user-selected or client-detected language ('ar' | 'en')")
     session_id: Optional[str] = Field(default=None, description="Optional conversational session ID")
     message_id: Optional[str] = Field(default=None, description="Optional client-generated message ID")
     stream: bool = Field(default=True, description="Whether to stream response via SSE")
@@ -39,6 +40,7 @@ class StreamEvent(BaseModel):
     token: Optional[str] = Field(default=None, description="Text token chunk")
     metrics: Optional[Dict[str, Any]] = Field(default=None, description="Latency, token speed, and source metrics")
     session_id: Optional[str] = Field(default=None, description="Session ID event payload")
+    language: Optional[str] = Field(default=None, description="Active or detected query language ('ar' | 'en')")
     done: bool = Field(default=False, description="Whether this marks stream completion")
 
 class FeedbackRequest(BaseModel):
@@ -57,6 +59,7 @@ class SessionHistoryResponse(BaseModel):
     """Multi-turn session history payload."""
     session_id: str
     brand: Optional[str] = None
+    language: Optional[str] = None
     created_at: str
     messages: List[Dict[str, Any]]
 
@@ -68,6 +71,7 @@ class AdminEscalationItem(BaseModel):
     query: str
     reason: str
     urgency: str
+    language: Optional[str] = Field(default="en", description="Detected customer inquiry language")
     created_at: str
 
 class AdminEscalationsResponse(BaseModel):

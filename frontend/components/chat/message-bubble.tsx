@@ -44,8 +44,9 @@ interface MessageBubbleProps {
 
 const FEEDBACK_TAGS = [
   "Hallucination",
-  "Irrelevant info",
+  "Incorrect Language",
   "Incomplete",
+  "Irrelevant info",
   "Incorrect advice",
   "Other"
 ];

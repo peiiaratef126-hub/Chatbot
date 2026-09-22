@@ -29,6 +29,7 @@ async def list_escalations(
             query=r["query"],
             reason=r["reason"],
             urgency=r.get("urgency", "High"),
+            language=r.get("language", "en"),
             created_at=r["created_at"]
         )
         for r in raw_escalations

@@ -102,9 +102,104 @@ class VectorService:
             self.is_connected_to_qdrant = False
             self.backend_type = "in_memory_sample_kb"
 
+    # Cross-Lingual Semantic Mapping for Arabic Inquiries
+    ARABIC_TO_ENGLISH_SEMANTIC_MAP: Dict[str, List[str]] = {
+        "بطارية": ["battery", "drains", "charge", "power"],
+        "بطاريه": ["battery", "drains", "charge", "power"],
+        "شحن": ["charge", "charging", "charger"],
+        "شاحن": ["charger", "cable", "power"],
+        "حرارة": ["overheating", "hot", "temperature"],
+        "سخونة": ["overheating", "hot", "temperature"],
+        "بتخلص": ["drains", "depletes", "fast"],
+        "بسرعة": ["rapidly", "fast"],
+        "تفريغ": ["drains", "discharge"],
+        "طاقة": ["power", "energy"],
+        "ايفون": ["iphone", "apple", "ios"],
+        "أيفون": ["iphone", "apple", "ios"],
+        "جهاز": ["device", "phone", "hardware"],
+        "جهازي": ["device", "phone", "iphone"],
+        "تلفون": ["phone", "device"],
+        "موبايل": ["mobile", "phone", "device"],
+        "ماك": ["macbook", "apple", "laptop"],
+        "ماكبوك": ["macbook", "laptop"],
+        "شاشة": ["screen", "display", "black"],
+        "شاشه": ["screen", "display", "black"],
+        "سوداء": ["black", "screen", "sleep"],
+        "معلق": ["frozen", "stuck", "unresponsive"],
+        "بصمة": ["face", "id", "touch", "biometric"],
+        "وجه": ["face", "id", "truedepth"],
+        "تحديث": ["update", "ios", "version"],
+        "نظام": ["system", "os", "software"],
+        "سماعة": ["airpods", "audio", "sound", "earbuds"],
+        "سماعه": ["airpods", "audio", "sound", "earbuds"],
+        "سماعات": ["airpods", "headphones", "earbuds"],
+        "ايربودز": ["airpods", "bluetooth", "case"],
+        "صوت": ["sound", "audio", "crackling", "volume"],
+        "بلوتوث": ["bluetooth", "pairing", "connect"],
+        "حساب": ["account", "id", "profile"],
+        "حسابي": ["account", "id", "my"],
+        "ايميل": ["email", "apple", "id"],
+        "باسورد": ["password", "reset", "login"],
+        "كلمة": ["password", "credential"],
+        "مرور": ["password", "login"],
+        "مقفول": ["locked", "recovery", "disabled"],
+        "تخزين": ["storage", "full", "icloud", "backup"],
+        "اي كلاود": ["icloud", "storage", "backup"],
+        "مساحة": ["storage", "space", "manage"],
+        "طلب": ["order", "package", "shipment"],
+        "طلبي": ["order", "package", "shipment"],
+        "شحنة": ["shipment", "package", "tracking"],
+        "شحنه": ["shipment", "package", "tracking"],
+        "طرد": ["package", "parcel", "delivery"],
+        "توصيل": ["delivery", "shipping", "transit"],
+        "تتبع": ["tracking", "track", "carrier"],
+        "تأخير": ["delayed", "late", "arrived"],
+        "وصل": ["delivered", "arrived", "received"],
+        "ارجاع": ["return", "refund", "replace"],
+        "إرجاع": ["return", "refund", "replace"],
+        "استرجاع": ["refund", "return", "reimbursement"],
+        "استبدال": ["replacement", "exchange"],
+        "إلغاء": ["cancel", "cancellation"],
+        "الغاء": ["cancel", "cancellation"],
+        "اشتراك": ["subscription", "charge", "membership"],
+        "فاتورة": ["billing", "invoice", "charge"],
+        "فلوس": ["money", "charge", "refund", "cost"],
+        "خصم": ["charge", "discount", "fee", "unauthorized"],
+        "بطاقة": ["card", "credit", "payment"],
+        "دفع": ["payment", "charge", "bill"],
+        "ابل": ["applesupport", "apple"],
+        "أبل": ["applesupport", "apple"],
+        "امازون": ["amazonhelp", "amazon"],
+        "أمازون": ["amazonhelp", "amazon"],
+        "اوبر": ["uber_support", "uber"],
+        "أوبر": ["uber_support", "uber"],
+        "سبوتيفاي": ["spotifycares", "spotify"],
+        "دلتا": ["delta", "flight"],
+        "نايكي": ["nikesupport", "nike"],
+        "رحلة": ["ride", "trip", "flight", "driver"],
+        "حذاء": ["shoes", "sneakers", "nike", "size"],
+        "حجز": ["booking", "reservation", "flight"],
+        "تذكرة": ["ticket", "flight", "boarding"]
+    }
+
+    def _contains_arabic(self, text: str) -> bool:
+        """Checks if text contains Arabic characters."""
+        return bool(re.search(r'[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]', text))
+
+    def _expand_arabic_query(self, query: str) -> str:
+        """Expands Arabic customer query with English cross-lingual keywords for KB search."""
+        extra_terms: List[str] = []
+        for ar_key, en_terms in self.ARABIC_TO_ENGLISH_SEMANTIC_MAP.items():
+            if ar_key in query:
+                extra_terms.extend(en_terms)
+        if extra_terms:
+            unique_terms = list(dict.fromkeys(extra_terms))
+            return f"{query} {' '.join(unique_terms)}"
+        return query
+
     def _tokenize(self, text: str) -> List[str]:
-        """Simple, fast tokenization for in-memory cosine ranking."""
-        return re.findall(r'\b[a-z0-9]{2,}\b', text.lower())
+        """Simple, fast tokenization preserving both Latin, digits, and Arabic characters."""
+        return re.findall(r'[\w]{2,}', text.lower())
 
     def _compute_in_memory_similarity(self, query: str, doc_text: str) -> float:
         """Computes BM25/Cosine hybrid similarity score without external dependencies."""
@@ -148,6 +243,7 @@ class VectorService:
         """
         Retrieves top relevant knowledge base articles for a query.
         Combines vector similarity / BM25 token matching with FlashRank cross-encoder reranker.
+        Includes cross-lingual expansion for Arabic queries.
         """
         use_rerank = enable_rerank if enable_rerank is not None else (self.settings.ENABLE_RERANKER and self.ranker is not None)
         limit = top_k or self.settings.TOP_K
@@ -155,15 +251,21 @@ class VectorService:
         candidate_limit = max(self.settings.CANDIDATE_TOP_K, limit * 2) if use_rerank else limit
         candidate_threshold = min(threshold, 0.20) if use_rerank else threshold
 
+        # Cross-lingual expansion for Arabic inquiries
+        search_query = query
+        if self._contains_arabic(query):
+            search_query = self._expand_arabic_query(query)
+            logger.info(f"Cross-lingual query expansion: '{query}' -> '{search_query}'")
+
         # 1. Retrieve initial candidate chunks (via Qdrant Cloud or in-memory BM25 fallback)
         if self.is_connected_to_qdrant and self.qdrant_client:
             try:
-                candidates = await self._search_qdrant(query, brand, candidate_limit, candidate_threshold)
+                candidates = await self._search_qdrant(search_query, brand, candidate_limit, candidate_threshold)
             except Exception as e:
                 logger.error(f"Qdrant query failed: {e}. Falling back to in-memory search.")
-                candidates = self._search_in_memory(query, brand, candidate_limit, candidate_threshold)
+                candidates = self._search_in_memory(search_query, brand, candidate_limit, candidate_threshold)
         else:
-            candidates = self._search_in_memory(query, brand, candidate_limit, candidate_threshold)
+            candidates = self._search_in_memory(search_query, brand, candidate_limit, candidate_threshold)
 
         if not candidates:
             return []
@@ -180,7 +282,7 @@ class VectorService:
                     }
                     for i, c in enumerate(candidates)
                 ]
-                rerank_req = RerankRequest(query=query, passages=passages)
+                rerank_req = RerankRequest(query=search_query, passages=passages)
                 reranked_results = self.ranker.rerank(rerank_req)
 
                 target_n = top_k or self.settings.RERANK_TOP_N
