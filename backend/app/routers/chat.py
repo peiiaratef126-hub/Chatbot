@@ -37,8 +37,9 @@ async def chat_endpoint(
                 type="error",
                 content=f"Stream encountered an unexpected error: {str(e)}"
             )
-            yield f"data: {err_event.model_dump_json()}\n\n"
-            yield f"data: {StreamEvent(type='done', done=True).model_dump_json()}\n\n"
+            done_event = StreamEvent(type="done", done=True)
+            yield "data: " + err_event.model_dump_json() + "\n\n"
+            yield "data: " + done_event.model_dump_json() + "\n\n"
 
     return StreamingResponse(
         event_generator(),

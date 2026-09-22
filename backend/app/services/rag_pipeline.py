@@ -59,6 +59,11 @@ class RAGPipeline:
         self.guardrails_service = guardrails_service or get_guardrails_service()
         self.session_service = session_service or get_session_service()
 
+    @staticmethod
+    def _sse_chunk(event: StreamEvent) -> str:
+        """Formats a StreamEvent into SSE data chunk strictly compatible with all Python versions."""
+        return "data: " + event.model_dump_json() + "\n\n"
+
     def _execute_order_status_tool(self, identifier: str) -> Dict[str, Any]:
         """Simulates an enterprise ERP / logistics order tracking tool."""
         clean_id = identifier.strip().upper()
@@ -103,7 +108,7 @@ class RAGPipeline:
             language=detected_lang
         )
         # Emit active session event
-        yield f"data: {StreamEvent(type='session', session_id=session_id, language=detected_lang).model_dump_json()}\n\n"
+        yield self._sse_chunk(StreamEvent(type="session", session_id=session_id, language=detected_lang))
 
         # 1. Safety Guardrails, Bilingual Policy & PII Sanitization (Milestones 1 & 2)
         user_message = raw_message
@@ -116,21 +121,29 @@ class RAGPipeline:
 
             if guard_eval.is_blocked:
                 if guard_eval.block_reason == "unsupported_language":
-                    yield f"data: {StreamEvent(type='guardrail', content='Policy restriction: Unsupported language (Arabic and English supported only).', language=detected_lang).model_dump_json()}\n\n"
-                    yield f"data: {StreamEvent(type='thought', content='Customer query rejected: language outside strict Arabic/English whitelist.', language=detected_lang).model_dump_json()}\n\n"
+                    yield self._sse_chunk(StreamEvent(type="guardrail", content="Policy restriction: Unsupported language (Arabic and English supported only).", language=detected_lang))
+                    yield self._sse_chunk(StreamEvent(type="thought", content="Customer query rejected: language outside strict Arabic/English whitelist.", language=detected_lang))
                 else:
-                    yield f"data: {StreamEvent(type='guardrail', content=f'Policy restriction: {guard_eval.block_reason}', language=detected_lang).model_dump_json()}\n\n"
-                    yield f"data: {StreamEvent(type='thought', content='Blocked harmful system directive or prompt injection attempt.', language=detected_lang).model_dump_json()}\n\n"
+                    policy_err = f"Policy restriction: {guard_eval.block_reason}"
+                    yield self._sse_chunk(StreamEvent(type="guardrail", content=policy_err, language=detected_lang))
+                    yield self._sse_chunk(StreamEvent(type="thought", content="Blocked harmful system directive or prompt injection attempt.", language=detected_lang))
 
                 # Stream safe rejection response directly
                 safe_text = guard_eval.safe_response or "I cannot fulfill this request due to enterprise safety policies."
                 for word in safe_text.split(" "):
-                    yield f"data: {StreamEvent(type='token', token=word + ' ', language=detected_lang).model_dump_json()}\n\n"
+                    token_chunk = word + " "
+                    yield self._sse_chunk(StreamEvent(type="token", token=token_chunk, language=detected_lang))
                     await asyncio.sleep(0.01)
 
                 elapsed = (time.perf_counter() - start_time) * 1000
-                yield f"data: {StreamEvent(type='metrics', metrics={'latency_ms': round(elapsed, 1), 'tokens_per_sec': 100, 'guardrail_blocked': True, 'language': detected_lang}).model_dump_json()}\n\n"
-                yield f"data: {StreamEvent(type='done', done=True, language=detected_lang).model_dump_json()}\n\n"
+                metrics_payload = {
+                    "latency_ms": round(elapsed, 1),
+                    "tokens_per_sec": 100,
+                    "guardrail_blocked": True,
+                    "language": detected_lang
+                }
+                yield self._sse_chunk(StreamEvent(type="metrics", metrics=metrics_payload, language=detected_lang))
+                yield self._sse_chunk(StreamEvent(type="done", done=True, language=detected_lang))
 
                 # Persist messages
                 await self.session_service.save_message(session_id, "user", raw_message, message_id=request.message_id)
@@ -138,7 +151,9 @@ class RAGPipeline:
                 return
 
             if guard_eval.redactions:
-                yield f"data: {StreamEvent(type='guardrail', content=f'Sanitized sensitive customer data: {', '.join(guard_eval.redactions)}', language=detected_lang).model_dump_json()}\n\n"
+                redacted_list_str = ", ".join(guard_eval.redactions)
+                sanitized_notice = f"Sanitized sensitive customer data: {redacted_list_str}"
+                yield self._sse_chunk(StreamEvent(type="guardrail", content=sanitized_notice, language=detected_lang))
                 user_message = guard_eval.sanitized_message
 
         # Persist sanitized user message
@@ -153,12 +168,12 @@ class RAGPipeline:
         if self.llm_service.is_trivial_greeting(user_message):
             logger.info(f"Routing request to sub-millisecond greeting fast-path (lang={detected_lang}).")
             thought_msg = "تم التعرف على التحية. جاري الرد الفوري المباشر." if detected_lang == "ar" else "Intent recognized as standard greeting. Executing direct fast-path response."
-            yield f"data: {StreamEvent(type='thought', content=thought_msg, language=detected_lang).model_dump_json()}\n\n"
+            yield self._sse_chunk(StreamEvent(type="thought", content=thought_msg, language=detected_lang))
 
             greeting_tokens: List[str] = []
             async for token in self.llm_service.stream_fastpath_greeting(brand=brand, language=detected_lang):
                 greeting_tokens.append(token)
-                yield f"data: {StreamEvent(type='token', token=token, language=detected_lang).model_dump_json()}\n\n"
+                yield self._sse_chunk(StreamEvent(type="token", token=token, language=detected_lang))
 
             elapsed = (time.perf_counter() - start_time) * 1000
             metrics_ev = StreamEvent(
@@ -174,8 +189,8 @@ class RAGPipeline:
                 },
                 language=detected_lang
             )
-            yield f"data: {metrics_ev.model_dump_json()}\n\n"
-            yield f"data: {StreamEvent(type='done', done=True, language=detected_lang).model_dump_json()}\n\n"
+            yield self._sse_chunk(metrics_ev)
+            yield self._sse_chunk(StreamEvent(type="done", done=True, language=detected_lang))
 
             # Persist assistant greeting
             await self.session_service.save_message(
@@ -207,7 +222,7 @@ class RAGPipeline:
                     thought_msg = f"تحليل استفسار العميل لعلامة '{brand or 'الكل'}' لاسترجاع المعرفة الموثقة باللغة المناسبة."
                 else:
                     thought_msg = f"Analyzing customer query for brand '{brand or 'All'}' to retrieve grounded knowledge."
-                yield f"data: {StreamEvent(type='thought', content=thought_msg, language=detected_lang).model_dump_json()}\n\n"
+                yield self._sse_chunk(StreamEvent(type="thought", content=thought_msg, language=detected_lang))
 
                 # Tool Call 1: Semantic Knowledge Base Search
                 tool_call_ev = StreamEvent(
@@ -216,7 +231,7 @@ class RAGPipeline:
                     input={"query": user_message, "brand": brand},
                     language=detected_lang
                 )
-                yield f"data: {tool_call_ev.model_dump_json()}\n\n"
+                yield self._sse_chunk(tool_call_ev)
 
                 # Execute hybrid vector search + FlashRank reranking
                 citations = await self.vector_service.search(
@@ -230,11 +245,15 @@ class RAGPipeline:
 
                 # Corrective RAG (CRAG) & Query Rewriting (Milestone 6)
                 if getattr(self.settings, "ENABLE_CRAG", True) and (not citations or top_score < self.settings.CRAG_CONFIDENCE_THRESHOLD):
-                    crag_thought = f"درجة الثقة أولية منخفضة ({top_score:.2f}). جاري تفعيل إعادة صياغة الاستعلام (CRAG)." if detected_lang == "ar" else f"Initial retrieval confidence low ({top_score:.2f} < {self.settings.CRAG_CONFIDENCE_THRESHOLD:.2f}). Triggering Corrective RAG (CRAG) query reformulation."
-                    yield f"data: {StreamEvent(type='thought', content=crag_thought, language=detected_lang).model_dump_json()}\n\n"
+                    if detected_lang == "ar":
+                        crag_thought = f"درجة الثقة أولية منخفضة ({top_score:.2f}). جاري تفعيل إعادة صياغة الاستعلام (CRAG)."
+                    else:
+                        crag_thought = f"Initial retrieval confidence low ({top_score:.2f} < {self.settings.CRAG_CONFIDENCE_THRESHOLD:.2f}). Triggering Corrective RAG (CRAG) query reformulation."
+                    yield self._sse_chunk(StreamEvent(type="thought", content=crag_thought, language=detected_lang))
                     
                     rewritten_query = await self.llm_service.reformulate_query(user_message, brand=brand)
-                    yield f"data: {StreamEvent(type='thought', content=f'CRAG reformulated query: \"{rewritten_query}\". Re-querying knowledge base.', language=detected_lang).model_dump_json()}\n\n"
+                    crag_reform_thought = f'CRAG reformulated query: "{rewritten_query}". Re-querying knowledge base.'
+                    yield self._sse_chunk(StreamEvent(type="thought", content=crag_reform_thought, language=detected_lang))
 
                     crag_citations = await self.vector_service.search(
                         query=rewritten_query,
@@ -247,9 +266,10 @@ class RAGPipeline:
                     if crag_top_score > top_score:
                         citations = crag_citations
                         top_score = crag_top_score
-                        yield f"data: {StreamEvent(type='thought', content=f'CRAG search improved top retrieval confidence to {top_score:.2f}.', language=detected_lang).model_dump_json()}\n\n"
+                        crag_imp_thought = f"CRAG search improved top retrieval confidence to {top_score:.2f}."
+                        yield self._sse_chunk(StreamEvent(type="thought", content=crag_imp_thought, language=detected_lang))
                     else:
-                        yield f"data: {StreamEvent(type='thought', content='CRAG re-query complete. Proceeding with synthesized context.', language=detected_lang).model_dump_json()}\n\n"
+                        yield self._sse_chunk(StreamEvent(type="thought", content="CRAG re-query complete. Proceeding with synthesized context.", language=detected_lang))
 
                 tool_result_ev = StreamEvent(
                     type="tool_result",
@@ -257,11 +277,11 @@ class RAGPipeline:
                     output={"matches_found": len(citations), "top_score": top_score, "reranked": bool(citations and citations[0].reranked)},
                     language=detected_lang
                 )
-                yield f"data: {tool_result_ev.model_dump_json()}\n\n"
+                yield self._sse_chunk(tool_result_ev)
 
                 # Emit individual citations to UI
                 for cit in citations:
-                    yield f"data: {StreamEvent(type='citation', citation=cit, language=detected_lang).model_dump_json()}\n\n"
+                    yield self._sse_chunk(StreamEvent(type="citation", citation=cit, language=detected_lang))
 
                 if citations:
                     kb_context = "\n".join(
@@ -273,15 +293,16 @@ class RAGPipeline:
                 # Check if secondary tool is triggered
                 if order_pattern:
                     order_num = (order_pattern.group(1) or order_pattern.group(2)).lstrip("#-_")
-                    yield f"data: {StreamEvent(type='thought', content=f'Detected order tracking request for ID {order_num}.', language=detected_lang).model_dump_json()}\n\n"
-                    yield f"data: {StreamEvent(type='tool_call', tool='check_order_status', input={'order_id': order_num}, language=detected_lang).model_dump_json()}\n\n"
+                    order_thought = f"Detected order tracking request for ID {order_num}."
+                    yield self._sse_chunk(StreamEvent(type="thought", content=order_thought, language=detected_lang))
+                    yield self._sse_chunk(StreamEvent(type="tool_call", tool="check_order_status", input={"order_id": order_num}, language=detected_lang))
                     order_res = self._execute_order_status_tool(order_num)
-                    yield f"data: {StreamEvent(type='tool_result', tool='check_order_status', output=order_res, language=detected_lang).model_dump_json()}\n\n"
+                    yield self._sse_chunk(StreamEvent(type="tool_result", tool="check_order_status", output=order_res, language=detected_lang))
                     tool_observations.append(f"Order Tracking Details:\n{json.dumps(order_res, indent=2)}")
 
                 if escalation_pattern:
-                    yield f"data: {StreamEvent(type='thought', content='High urgency or customer escalation request detected. Triggering tier-2 dispatch.', language=detected_lang).model_dump_json()}\n\n"
-                    yield f"data: {StreamEvent(type='tool_call', tool='escalate_to_human', input={'reason': user_message[:50], 'brand': brand, 'urgency': 'high', 'language': detected_lang}, language=detected_lang).model_dump_json()}\n\n"
+                    yield self._sse_chunk(StreamEvent(type="thought", content="High urgency or customer escalation request detected. Triggering tier-2 dispatch.", language=detected_lang))
+                    yield self._sse_chunk(StreamEvent(type="tool_call", tool="escalate_to_human", input={"reason": user_message[:50], "brand": brand, "urgency": "high", "language": detected_lang}, language=detected_lang))
                     esc_res = self._execute_escalation_tool(user_message, brand=brand)
                     try:
                         await self.session_service.save_escalation(
@@ -295,7 +316,7 @@ class RAGPipeline:
                         )
                     except Exception as e_esc:
                         logger.warning(f"Could not persist escalation to SQLite ({e_esc})")
-                    yield f"data: {StreamEvent(type='tool_result', tool='escalate_to_human', output=esc_res, language=detected_lang).model_dump_json()}\n\n"
+                    yield self._sse_chunk(StreamEvent(type="tool_result", tool="escalate_to_human", output=esc_res, language=detected_lang))
                     tool_observations.append(f"Escalation Dispatch Details:\n{json.dumps(esc_res, indent=2)}")
 
                 # Ready to synthesize final answer
@@ -303,7 +324,7 @@ class RAGPipeline:
 
         # 4. Final Answer Synthesis & Token Streaming
         synthesis_thought = "صياغة الرد المعتمد والنهائي باللغة العربية بناءً على سياق المعرفة الموثقة." if detected_lang == "ar" else "Synthesizing grounded response from verified context."
-        yield f"data: {StreamEvent(type='thought', content=synthesis_thought, language=detected_lang).model_dump_json()}\n\n"
+        yield self._sse_chunk(StreamEvent(type="thought", content=synthesis_thought, language=detected_lang))
 
         prompt_messages: List[Dict[str, str]] = [
             {"role": "system", "content": SYSTEM_RAG_PROMPT}
@@ -331,7 +352,7 @@ class RAGPipeline:
         async for token in self.llm_service.stream_chat_completion(prompt_messages):
             token_count += 1
             response_tokens.append(token)
-            yield f"data: {StreamEvent(type='token', token=token, language=detected_lang).model_dump_json()}\n\n"
+            yield self._sse_chunk(StreamEvent(type="token", token=token, language=detected_lang))
 
         # 5. Final Performance Metrics Event
         elapsed_total = (time.perf_counter() - start_time) * 1000
@@ -352,7 +373,7 @@ class RAGPipeline:
             },
             language=detected_lang
         )
-        yield f"data: {metrics_ev.model_dump_json()}\n\n"
+        yield self._sse_chunk(metrics_ev)
 
         # 6. Persist assistant response to session
         full_assistant_reply = "".join(response_tokens)
@@ -364,7 +385,7 @@ class RAGPipeline:
         )
 
         # 7. Done Event
-        yield f"data: {StreamEvent(type='done', done=True, language=detected_lang).model_dump_json()}\n\n"
+        yield self._sse_chunk(StreamEvent(type="done", done=True, language=detected_lang))
 
 _rag_pipeline_instance: Optional[RAGPipeline] = None
 
