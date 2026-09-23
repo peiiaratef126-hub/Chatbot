@@ -96,7 +96,7 @@ describe("Frontend API Client Test Suite", () => {
       assert.strictEqual(thoughts[0], "Testing thought");
       assert.strictEqual(accumulatedTokens, "Hello World");
       assert.ok(capturedMetrics);
-      assert.strictEqual(capturedMetrics?.tokens_per_sec, 300);
+      assert.strictEqual((capturedMetrics as PerformanceMetrics).tokens_per_sec, 300);
       assert.strictEqual(doneTriggered, true);
     } finally {
       globalThis.fetch = originalFetch;

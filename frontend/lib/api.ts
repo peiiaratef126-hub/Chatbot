@@ -156,6 +156,14 @@ export async function streamChatMessage(
   const reader = response.body.getReader();
   const decoder = new TextDecoder("utf-8");
   let buffer = "";
+  let doneEmitted = false;
+
+  const emitDone = () => {
+    if (!doneEmitted) {
+      doneEmitted = true;
+      callbacks.onDone?.();
+    }
+  };
 
   try {
     while (true) {
@@ -210,7 +218,7 @@ export async function streamChatMessage(
                   callbacks.onError?.(parsed.content || "An error occurred");
                   break;
                 case "done":
-                  callbacks.onDone?.();
+                  emitDone();
                   break;
               }
             } catch (err) {
@@ -222,7 +230,7 @@ export async function streamChatMessage(
     }
   } finally {
     reader.releaseLock();
-    callbacks.onDone?.();
+    emitDone();
   }
 }
 

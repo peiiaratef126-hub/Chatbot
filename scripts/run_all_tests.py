@@ -76,8 +76,17 @@ def main():
     total_start = time.perf_counter()
     results = []
 
-    # 1. Frontend Unit Tests (Node 24 Native Test Runner)
+    # 1. Frontend TypeScript Compilation Check (tsc --noEmit)
     frontend_dir = REPO_ROOT / "frontend"
+    tsc_cmd = "cmd /c npx tsc --noEmit" if is_windows else "npx tsc --noEmit"
+    passed, dur = run_step(
+        "Frontend TypeScript Type Check (tsc --noEmit)",
+        tsc_cmd,
+        cwd=frontend_dir
+    )
+    results.append(("Frontend TypeScript Type Check", passed, dur))
+
+    # 2. Frontend Unit Tests (Node 24 Native Test Runner)
     passed, dur = run_step(
         "Frontend TypeScript Unit Tests (node --test)",
         "npm test",
@@ -85,7 +94,7 @@ def main():
     )
     results.append(("Frontend Unit Tests (22 tests)", passed, dur))
 
-    # 2. Frontend Production Build (Next.js 14 App Router)
+    # 3. Frontend Production Build (Next.js 14 App Router)
     passed, dur = run_step(
         "Frontend Production Build (next build)",
         BUILD_CMD,
@@ -93,14 +102,14 @@ def main():
     )
     results.append(("Frontend Production Build", passed, dur))
 
-    # 3. Backend Pytest Suite (FastAPI, VectorService, RAGPipeline, Scripts, RAG Eval)
+    # 4. Backend Pytest Suite (FastAPI, VectorService, RAGPipeline, Scripts, RAG Eval)
     backend_dir = REPO_ROOT / "backend"
     passed, dur = run_step(
-        "Backend Pytest Suite (35 tests)",
+        "Backend Pytest Suite (40 tests)",
         f'"{PYTEST_EXE}" tests/ -v',
         cwd=backend_dir
     )
-    results.append(("Backend Pytest Suite (35 tests)", passed, dur))
+    results.append(("Backend Pytest Suite (40 tests)", passed, dur))
 
     # 4. Live Cloud Production Integration Tests
     passed, dur = run_step(
